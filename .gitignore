@@ -26,3 +26,4 @@ dist-ssr
 
 # added by author
 .vscode
+.vercel

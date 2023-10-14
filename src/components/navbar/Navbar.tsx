@@ -85,11 +85,11 @@ const Navbar = () => {
           <a className="navbar-links" href="#service">
             WHAT WE DO
           </a>
-          {/* {userData?.role === "user" && ( */}
-          <a className="navbar-links" href="/appointments">
-            APPOINTMENTS
-          </a>
-          {/* )} */}
+          {userData?.role === "user" && (
+            <a className="navbar-links" href="/appointments">
+              APPOINTMENTS
+            </a>
+          )}
           {userData?.role === "admin" && (
             <div className="nav-dropdown" onClick={toggleManagementDropdown}>
               <span className="nav-link">MANAGEMENT</span>
