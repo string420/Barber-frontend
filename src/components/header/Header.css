@@ -1,0 +1,67 @@
+.header {
+  background-image: url("../../assets/bg-image.jpg");
+  height: calc(100vh - (100px));
+  background-blend-mode: darken;
+  background-color: rgba(0, 0, 0, 0.9);
+  background-size: cover;
+  background-position: center;
+  opacity: initial;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  gap: 30px;
+}
+
+.header-design-line {
+  width: 600px;
+  padding: 20px 0px;
+}
+
+.header-title {
+  color: white;
+  font-size: 150px;
+  font-family: "Brewell", sans-serif;
+  font-weight: lighter;
+  text-align: center;
+  margin: 0;
+}
+
+.header-secondary-title {
+  color: #e1d4bb;
+  font-size: 50px;
+  margin: 0;
+}
+
+.header-appointment-btn {
+  cursor: pointer;
+}
+
+/*  */
+
+@media (max-width: 768px) {
+  .header {
+    align-items: flex-start;
+  }
+  .header-design-line {
+    width: 300px;
+  }
+  .header-title {
+    font-size: 50px;
+  }
+  .header-secondary-title {
+    font-size: 20px;
+  }
+  .header-appointment-btn {
+    width: 300px;
+    height: auto;
+  }
+}
