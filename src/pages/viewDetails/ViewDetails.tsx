@@ -1,10 +1,10 @@
 import "./ViewDetails.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 // , useRef, useCallback
 import axios from "axios";
 import { AppointmentInterface } from "../../Types";
-import { Rating } from "@mui/material";
+import Rating from "@mui/material/Rating";
 import { toast } from "react-toastify";
 // import Webcam from "react-webcam";
 
@@ -30,8 +30,8 @@ const ViewDetails = () => {
 
   const [appointmentData, setAppointmentData] =
     useState<AppointmentInterface>();
-  const [value, setValue] = useState<number | null>(0);
   const [ImageFile, setImageFile] = useState<string>("");
+  const [rating, setRating] = useState<number>(0);
 
   const fileTypeChecking = (e: any) => {
     var fileInput = document.getElementById("file-upload") as HTMLInputElement;
@@ -56,18 +56,35 @@ const ViewDetails = () => {
         `${import.meta.env.VITE_APP_API_URL}/api/appointment/${id}`
       );
       setAppointmentData(res.data);
+      setRating(res.data.barberRating);
     };
     fetch();
   }, [id]);
+
+  const navigate = useNavigate();
+
+  const updateBarberRating = async (barberName: string) => {
+    try {
+      await axios.put(
+        `${
+          import.meta.env.VITE_APP_API_URL
+        }/api/barbers/updateRating/${barberName}`
+      );
+      console.log("Average rating updated successfully.");
+    } catch (error) {
+      console.error("Error updating average rating:", error);
+    }
+  };
 
   const updateRating = async () => {
     try {
       await axios.put(
         `${import.meta.env.VITE_APP_API_URL}/api/appointment/update/${id}`,
         {
-          barberRating: value,
+          barberRating: rating,
         }
       );
+      updateBarberRating(appointmentData?.barberName || "");
       toast("Successful Submitted the rating!", {
         type: "success",
         position: "bottom-right",
@@ -78,7 +95,7 @@ const ViewDetails = () => {
         progress: undefined,
       });
       setTimeout(() => {
-        window.location.reload();
+        navigate("/");
       }, 2000);
     } catch (error) {
       console.log(error);
@@ -88,27 +105,9 @@ const ViewDetails = () => {
   return (
     <div className="viewdetails">
       <div className="viewdetails-container">
-        <section className="viewdetails-item-container">
-          <label className="viewdetails-item">
-            Barber: {appointmentData?.barberName}
-          </label>
-          <label className="viewdetails-item">
-            Barber's Rating:
-            {appointmentData?.barberRating === undefined ? (
-              "loading"
-            ) : (
-              <Rating
-                name="simple-controlled"
-                value={appointmentData?.barberRating}
-                onChange={(event, newValue) => {
-                  console.log(event);
-                  setValue(newValue);
-                }}
-              />
-            )}
-            <button onClick={updateRating}>Submit Rating</button>
-          </label>
-        </section>
+        <h1 className="viewdetails-item">
+          Barber's name: {appointmentData?.barberName}
+        </h1>
 
         <div className="upload-image-container">
           <h1>Compare your current haircut to your picked filter</h1>
@@ -140,6 +139,24 @@ const ViewDetails = () => {
               style={{ display: "none" }}
             />
           </label>
+          {ImageFile && (
+            <label className="viewdetails-item">
+              Barber's Rating:
+              {appointmentData?.barberRating === undefined ? (
+                "loading"
+              ) : (
+                <Rating
+                  name="simple-controlled"
+                  value={rating}
+                  onChange={(event, newValue) => {
+                    console.log(event);
+                    setRating(newValue || 0);
+                  }}
+                />
+              )}
+              <button onClick={updateRating}>Submit Rating</button>
+            </label>
+          )}
         </div>
       </div>
     </div>

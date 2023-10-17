@@ -13,6 +13,8 @@ import CutManagement from "./pages/management/CutManagement";
 import ViewDetails from "./pages/viewDetails/ViewDetails";
 // import FaceImageFilter from "./components/face_detection/FaceImageFilter";
 import CreateAppointment from "./pages/createAppointment/CreateAppointment";
+import ForTryFilter from "./components/face_detection/ForTryFilter";
+import Reviews from "./pages/reviews/Reviews";
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/appointments/:id" element={<ViewDetails />} />
         <Route path="/appointment/:date" element={<CreateAppointment />} />
+        <Route path="/try-filter-camera" element={<ForTryFilter />} />
+        <Route path="/reviews" element={<Reviews />} />
         {/* admin */}
         <Route path="/admin/appointment" element={<AppointmentManagement />} />
         <Route path="/admin/barbers" element={<BarberManagement />} />

@@ -83,3 +83,8 @@ export interface CutInterface {
   description: string;
   createdAt: string;
 }
+
+export interface AppointmentRatingInterface {
+  _id: string;
+  averageRating: number;
+}

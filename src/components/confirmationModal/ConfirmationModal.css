@@ -1,0 +1,40 @@
+.orderConfirmationModal {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.orderConfirmBtns {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.orderConfirmPrice {
+  font-size: 24px;
+}
+
+.orderProceedBtn {
+  background-color: green;
+  color: white;
+  font-weight: bold;
+  width: 200px;
+  height: 50px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.orderCancelBtn {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  width: 200px;
+  height: 50px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}

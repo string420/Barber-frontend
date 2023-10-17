@@ -85,11 +85,14 @@ const Navbar = () => {
           <a className="navbar-links" href="#service">
             WHAT WE DO
           </a>
-          {userData?.role === "user" && (
-            <a className="navbar-links" href="/appointments">
-              APPOINTMENTS
-            </a>
-          )}
+          <a className="navbar-links" href="/reviews">
+            REVIEWS
+          </a>
+          {/* {userData?.role === "user" && ( */}
+          <a className="navbar-links" href="/appointments">
+            APPOINTMENTS
+          </a>
+          {/* )} */}
           {userData?.role === "admin" && (
             <div className="nav-dropdown" onClick={toggleManagementDropdown}>
               <span className="nav-link">MANAGEMENT</span>
@@ -118,7 +121,7 @@ const Navbar = () => {
               )}
             </div>
           )}
-          <a className="navbar-links" href="/camera">
+          <a className="navbar-links" href="/try-filter-camera">
             TRY OUR FILTER
           </a>
         </div>

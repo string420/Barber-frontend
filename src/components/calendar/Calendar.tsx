@@ -18,7 +18,7 @@ const Calendar = () => {
 
   const { data } = useQuery<AppointmentInterface[]>("Calendar", async () => {
     const response = await axios.get(
-      `${import.meta.env.VITE_APP_API_URL}/api/appointment/list/${user}`
+      `${import.meta.env.VITE_APP_API_URL}/api/appointment`
     );
     return response.data.map((appointment: any) => ({
       title: appointment.appointmentTime,

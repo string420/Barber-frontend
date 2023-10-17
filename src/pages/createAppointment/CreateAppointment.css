@@ -105,3 +105,24 @@ span {
   object-fit: contain;
   margin-bottom: 20px;
 }
+
+.update-product-image-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 90%;
+}
+.update-product-input-image {
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed black;
+  margin-top: 10px;
+}
+
+.addcategory-img {
+  width: 200px;
+  height: 200px;
+}

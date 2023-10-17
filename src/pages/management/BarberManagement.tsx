@@ -14,6 +14,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { useState } from "react";
 import AddBarber from "../../components/management/AddBarber";
+import { toast } from "react-toastify";
 
 const BarberManagement = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -28,6 +29,28 @@ const BarberManagement = () => {
 
   const toggleOpen = () => {
     setOpen(!open);
+  };
+
+  const onChangeHandleStatus = async (id: string, status: string) => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_APP_API_URL}/api/barber/update/${id}`,
+        {
+          status: status,
+        }
+      );
+      toast.success(`Successfully change the status`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -79,7 +102,25 @@ const BarberManagement = () => {
                   {item.fullname}
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  <span className="capitalize">{item.status}</span>
+                  <div>
+                    <select
+                      style={{ padding: "10px", border: "1px solid #ccc" }}
+                      defaultValue={item.status}
+                      onChange={(e) =>
+                        onChangeHandleStatus(item._id, e.target.value)
+                      }
+                    >
+                      <option style={{ fontSize: "16px" }} value="available">
+                        Available
+                      </option>
+                      <option
+                        style={{ fontSize: "16px" }}
+                        value="not available"
+                      >
+                        Not available
+                      </option>
+                    </select>
+                  </div>
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   {dayjs(item.createdAt).format("YYYY-MM-DD")}

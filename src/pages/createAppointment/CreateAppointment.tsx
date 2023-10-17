@@ -7,7 +7,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import axios from "axios";
 import useAuthStore from "../../zustand/AuthStore";
 import { toast } from "react-toastify";
-import { BarberInterface, CutInterface } from "../../Types";
+import {
+  AppointmentInterface,
+  BarberInterface,
+  CutInterface,
+} from "../../Types";
 import { useLocation, useNavigate } from "react-router-dom";
 import RenderFilter from "../../components/face_detection/RenderFilter";
 import { Dialog, DialogContent } from "@mui/material";
@@ -20,6 +24,34 @@ const CreateAppointment = () => {
   const selectedDate = location.pathname.split("/")[2];
   const navigate = useNavigate();
 
+  // added
+
+  const [reservedTimeSlots, setReservedTimeSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get<AppointmentInterface[]>(
+        `${import.meta.env.VITE_APP_API_URL}/api/appointment`
+      );
+
+      // Filter reserved time slots for the selected date
+      const selectedDateAppointments = response.data?.filter(
+        (appointment) =>
+          dayjs(appointment.appointmentDate).format("YYYY-MM-DD") ===
+          selectedDate
+      );
+
+      const reservedSlots = selectedDateAppointments.map(
+        (appointment) => appointment?.appointmentTime
+      );
+
+      setReservedTimeSlots(reservedSlots);
+    };
+    fetchData();
+  }, []);
+
+  // added
+
   const [contactNumber, setContactNumber] = useState<string>("");
   const [reason, setReason] = useState<string>("");
 
@@ -31,34 +63,15 @@ const CreateAppointment = () => {
   const [isOpenQRModal, setIsOpenQRModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [time, setTime] = useState<Dayjs | null>(dayjs(new Date()));
+  const [imageFile, setImageFile] = useState<string>("");
 
   const roundedTime =
     Number(time?.minute()) < 1
       ? time?.startOf("hour")
       : Number(time?.add(1, "hour").startOf("hour")) + 1;
 
-  // const addMinutes = time?.add(45, "minute");
-
-  // const roundedTime = addMinutes?.hour();
-
-  // const theNextHour = time?.set({
-  //   hour: roundedTime,
-  //   minute: 0,
-  //   second: 0,
-  //   millisecond: 0,
-  // });
-
-  // setTime(theNextHour);
-
-  // console.log(roundedTime);
-
   const handleCloseBtn = () => {
     setIsOpenQRModal(false);
-    navigate("/");
-  };
-
-  const toggleQRModal = () => {
-    setIsOpenQRModal(true);
   };
 
   useEffect(() => {
@@ -84,57 +97,6 @@ const CreateAppointment = () => {
   const availableBarberList = barberList?.filter(
     (item) => item.status === "available"
   );
-
-  const handleSubmitAppointment = async () => {
-    setLoading(true);
-    if (contactNumber === "") {
-      setLoading(false);
-      return alert("Please put contact number on the field");
-    }
-
-    if (selectedBarber === "") {
-      setLoading(false);
-      return alert("Please select your barber");
-    }
-
-    if (selectedCutStyle === "") {
-      setLoading(false);
-      return alert("Please select your cut style");
-    }
-
-    const appointmentData = {
-      email: user,
-      contactNumber: contactNumber,
-      appointmentDate: dayjs(selectedDate).format("YYYY-MM-DD"),
-      appointmentTime: dayjs(time).format("hh:mmA"),
-      barberName: selectedBarber,
-      cutStyle: selectedCutStyle,
-      base64ImageUrl: base64Image,
-      reason: reason,
-    };
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_APP_API_URL}/api/appointment/create`,
-        appointmentData
-      );
-      toast("Successful Registration!", {
-        type: "success",
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        draggable: true,
-        progress: undefined,
-      });
-      setLoading(false);
-      setTimeout(() => {
-        toggleQRModal();
-      }, 2000);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    }
-  };
 
   const printAppointmentDetails = () => {
     const htmlContent = `
@@ -178,6 +140,95 @@ const CreateAppointment = () => {
     printWindow?.close();
   };
 
+  console.log(base64Image);
+
+  const handleSubmitAppointment = async () => {
+    setLoading(true);
+    try {
+      const data = new FormData();
+      data.append("file", imageFile);
+      data.append("upload_preset", "upload");
+      const uploadRes = await axios.post(
+        "https://api.cloudinary.com/v1_1/alialcantara/image/upload",
+        data
+      );
+      const { url } = uploadRes.data;
+
+      const appointmentData = {
+        email: user,
+        contactNumber: contactNumber,
+        appointmentDate: dayjs(selectedDate).format("YYYY-MM-DD"),
+        appointmentTime: dayjs(time).format("hh:mmA"),
+        barberName: selectedBarber,
+        cutStyle: selectedCutStyle,
+        base64ImageUrl: base64Image,
+        reason: reason,
+        receipt: url,
+      };
+
+      await axios.post(
+        `${import.meta.env.VITE_APP_API_URL}/api/appointment/create`,
+        appointmentData
+      );
+      toast("Successful Registration!", {
+        type: "success",
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+      });
+      setLoading(false);
+      setTimeout(() => {
+        printAppointmentDetails();
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+
+  const fileTypeChecking = (e: any) => {
+    var fileInput = document.getElementById("file-upload") as HTMLInputElement;
+    var filePath = fileInput.value;
+
+    // Allowing file type
+    var allowedExtensions = /(\.png|\.jpg|\.jpeg)$/i;
+    // |\.pdf|\.tex|\.txt|\.rtf|\.wps|\.wks|\.wpd
+
+    if (!allowedExtensions.exec(filePath)) {
+      alert("Invalid file type");
+      fileInput.value = "";
+      return false;
+    }
+
+    setImageFile(e.target.files[0]);
+  };
+
+  const toggleQRModal = () => {
+    if (contactNumber === "") {
+      setLoading(false);
+      return alert("Please put contact number on the field");
+    }
+
+    if (selectedBarber === "") {
+      setLoading(false);
+      return alert("Please select your barber");
+    }
+
+    if (selectedCutStyle === "") {
+      setLoading(false);
+      return alert("Please select your cut style");
+    }
+    setIsOpenQRModal(true);
+  };
+
+  const handleNavigateCalendar = () => {
+    navigate("/calendar");
+  };
+
   return (
     <div className="calendar-modal">
       <h1 style={{ color: "white" }}>Create Appointment</h1>
@@ -195,19 +246,14 @@ const CreateAppointment = () => {
             onChange={(newValue) => setTime(newValue)}
             timeSteps={{ hours: 1, minutes: 60, seconds: 60 }}
             sx={{ color: "white", backgroundColor: "white" }}
+            minTime={dayjs().startOf("day").add(8, "hour")}
+            maxTime={dayjs().startOf("day").add(20, "hour")}
             disablePast
+            shouldDisableTime={(time) =>
+              reservedTimeSlots.includes(dayjs(time).format("hh:mmA"))
+            }
           />
         </LocalizationProvider>
-
-        {/* <div className="calendar-container-item">
-          <label>Full Name</label>
-          <input
-            type="text"
-            placeholder="Fullname"
-            className="calendar-modal-input"
-
-          />
-        </div> */}
 
         <div className="calendar-container-item">
           <label>Pick your Barber</label>
@@ -267,26 +313,37 @@ const CreateAppointment = () => {
         </div>
       </div>
       <RenderFilter setBase64Image={setBase64Image} />
+      <button className="create-appointment-btn" onClick={toggleQRModal}>
+        {loading ? "Please wait..." : "Proceed to Payment"}
+      </button>
       <button
         className="create-appointment-btn"
-        onClick={handleSubmitAppointment}
+        style={{ backgroundColor: "red", color: "white" }}
+        onClick={handleNavigateCalendar}
       >
-        {loading ? "Please wait..." : "Submit Appointment"}
+        Go back to Calendar
       </button>
       <Dialog open={isOpenQRModal} onClose={toggleQRModal}>
         <DialogContent>
           <div className="shipping-modal">
             <img src={QRCode} alt="" className="qr-image" />
 
-            <span style={{ fontSize: "20px" }}>
-              Please scan it or save it then print the receipt before closing.
+            <span style={{ fontSize: "20px", textAlign: "center" }}>
+              To proceed to appointment please pay the ₱ 50 payment then upload
+              the receipt on the button below. Note: No refund policy upon
+              cancellation of appointment.
             </span>
-            <button
-              className="shipping-btn-close"
-              onClick={printAppointmentDetails}
-            >
-              Print Receipt
-            </button>
+
+            <label htmlFor="file-upload" className="update-product-input-image">
+              Upload Receipt Here...
+              <input
+                type="file"
+                id="file-upload"
+                onChange={fileTypeChecking}
+                style={{ display: "none" }}
+              />
+            </label>
+
             <button
               className="shipping-btn-close"
               style={{ backgroundColor: "red", padding: "10px 70px" }}
@@ -295,23 +352,39 @@ const CreateAppointment = () => {
               Close
             </button>
           </div>
+          {imageFile && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
+              <button
+                className="create-appointment-btn"
+                onClick={handleSubmitAppointment}
+              >
+                {loading ? "Please wait.." : "Submit Appointment"}
+              </button>
+              <div className="update-product-image-container">
+                <h3>Receipt</h3>
+                <img
+                  src={
+                    imageFile
+                      ? URL.createObjectURL(
+                          new Blob([imageFile], { type: "image/jpeg" })
+                        )
+                      : ""
+                  }
+                  alt="AddImage"
+                  className="addcategory-img"
+                />
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
-
-      {/* <Dialog open={isOpenQRModal} onClose={toggleQRModal}>
-        <DialogContent>
-          <div className="shipping-modal">
-            <img src={QRCode} alt="" className="qr-image" />
-
-            <span style={{ fontSize: "20px" }}>
-              Please scan it or save it before closing.
-            </span>
-            <button className="shipping-btn-close" onClick={handleCloseBtn}>
-              Print Receipt
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog> */}
     </div>
   );
 };
