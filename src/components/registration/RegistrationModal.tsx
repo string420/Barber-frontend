@@ -23,6 +23,16 @@ const Registration = ({ toggleRegistrationModal }: any) => {
     }));
   };
 
+  const sendEmail = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_APP_API_URL}/api/email/send`, {
+        recipient: registrationInfo.email,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
@@ -32,7 +42,8 @@ const Registration = ({ toggleRegistrationModal }: any) => {
         registrationInfo
       );
 
-      toast("Successful Registration!", {
+      sendEmail();
+      toast.success("Please check your email to verify your registration!", {
         type: "success",
         position: "bottom-right",
         autoClose: 2000,

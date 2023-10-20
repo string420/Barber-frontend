@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import AddBarber from "../../components/management/AddBarber";
 import { toast } from "react-toastify";
+import UpdateBarber from "../../components/management/UpdateBarber";
 
 const BarberManagement = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -51,6 +52,37 @@ const BarberManagement = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleDeleteBarber = async (id: string) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_APP_API_URL}/api/barber/delete/${id}`
+      );
+      toast.success(`Successfully Delete barber`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [openUpdateBarber, setOpenUpdateBarber] = useState<boolean>(false);
+  const [paramsId, setParamsId] = useState<string>("");
+
+  const toggleUpdateBarber = (id: string) => {
+    setParamsId(id);
+    setOpenUpdateBarber(true);
+  };
+
+  const toggleUpdateBarberClose = () => {
+    setOpenUpdateBarber(false);
   };
 
   return (
@@ -127,8 +159,36 @@ const BarberManagement = () => {
                 </TableCell>
 
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  <button style={{ marginRight: "10px" }}>Edit</button>
-                  <button>Delete</button>
+                  <button
+                    style={{
+                      width: "70px",
+                      height: "30px",
+                      backgroundColor: "green",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      marginRight: "10px",
+                    }}
+                    onClick={() => toggleUpdateBarber(item._id)}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    style={{
+                      width: "70px",
+                      height: "30px",
+                      backgroundColor: "red",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleDeleteBarber(item._id)}
+                  >
+                    Delete
+                  </button>
                 </TableCell>
               </TableRow>
             ))}
@@ -138,6 +198,14 @@ const BarberManagement = () => {
       <Dialog open={open} onClose={toggleOpen}>
         <DialogContent>
           <AddBarber />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={openUpdateBarber} onClose={toggleUpdateBarberClose} >
+        <DialogContent>
+          <UpdateBarber
+            toggleUpdateBarberClose={toggleUpdateBarberClose}
+            paramsId={paramsId}
+          />
         </DialogContent>
       </Dialog>
     </div>

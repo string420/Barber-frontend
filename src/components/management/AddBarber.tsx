@@ -22,18 +22,33 @@ const AddBarber = () => {
     <div
       style={{
         width: "300px",
-        height: "350px",
         borderRadius: "20px",
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
       }}
     >
-      <label>
+      <label
+        style={{ display: "flex", flexDirection: "column", width: "100%" }}
+      >
         Barber's Name:
-        <input type="text" onChange={(e) => setName(e.target.value)} />
+        <input
+          type="text"
+          onChange={(e) => setName(e.target.value)}
+          style={{ width: "98%", height: "30px", paddingLeft: "5px" }}
+        />
       </label>
-      <button onClick={handleAddBarber}>Add Barber</button>
+      <button
+        style={{
+          width: "100%",
+          height: "30px",
+          marginTop: "5px",
+          marginBottom: "5px",
+        }}
+        onClick={handleAddBarber}
+      >
+        Add Barber
+      </button>
     </div>
   );
 };

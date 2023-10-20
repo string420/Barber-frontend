@@ -68,6 +68,7 @@ export interface UserInterface {
   fullname: string;
   password: string;
   role: string;
+  isEnable: boolean;
 }
 
 export interface BarberInterface {

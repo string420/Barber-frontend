@@ -17,8 +17,6 @@ const Reviews = () => {
         .then((res) => res.data),
   });
 
-  console.log(data);
-
   return (
     <div
       style={{

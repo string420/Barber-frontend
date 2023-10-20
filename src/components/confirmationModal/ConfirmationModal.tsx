@@ -8,7 +8,6 @@ interface Props {
 }
 
 const ConfirmationModal = ({ paramsId, toggleCloseConfirmation }: Props) => {
-  console.log("eto ung paramsId", paramsId);
   const handleCancelAppointment = async () => {
     try {
       await axios.delete(

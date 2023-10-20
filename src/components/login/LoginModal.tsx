@@ -1,9 +1,9 @@
 import "./Login.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Dialog, DialogContent } from "@mui/material";
 import useAuthStore from "../../zustand/AuthStore";
-import { LoginInterface, Transition } from "../../Types";
+import { LoginInterface, Transition, UserInterface } from "../../Types";
 import Registration from "../registration/RegistrationModal";
 import logo from "../../assets/logo.png";
 
@@ -17,6 +17,8 @@ const Login = ({ toggleLoginModal }: any) => {
   const [regIsOpen, setRegIsOpen] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<string>("");
+  const [userData, setUserData] = useState<UserInterface>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -32,18 +34,35 @@ const Login = ({ toggleLoginModal }: any) => {
     toggleLoginModal();
   };
 
-  const handleLogin = async (event: any) => {
-    event.preventDefault();
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_BASE_URL}/api/user/${credentials.email}`
+      );
+      setUserData(response.data);
+    };
+    fetchData();
+  }, [credentials.email]);
+
+  const handleLogin = async () => {
+    setLoading(true);
     try {
+      if (userData?.isEnable === false) {
+        setLoading(false);
+        return alert("Please verify your account in your email first");
+      }
+
       await axios.post(
         `${import.meta.env.VITE_APP_API_URL}/api/user/login`,
         credentials
       );
 
       setUser(credentials.email);
+      setLoading(false);
       toggleLoginModal();
     } catch (err) {
       console.log(err);
+      setLoading(false);
       setErrors("Incorrect email or password.");
     }
   };
@@ -76,7 +95,7 @@ const Login = ({ toggleLoginModal }: any) => {
           </div>
         )}
         <button className="login-btn" onClick={handleLogin}>
-          Login
+          {loading ? "Please wait..." : "Login"}
         </button>
 
         <p className="login-text">
