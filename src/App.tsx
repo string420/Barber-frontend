@@ -2,7 +2,7 @@ import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Navbar from "./components/navbar/Navbar";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Calendar from "./components/calendar/Calendar";
 // import FaceDetection from "./components/face_detection/FaceFilter";
@@ -15,23 +15,46 @@ import ViewDetails from "./pages/viewDetails/ViewDetails";
 import CreateAppointment from "./pages/createAppointment/CreateAppointment";
 import ForTryFilter from "./components/face_detection/ForTryFilter";
 import Reviews from "./pages/reviews/Reviews";
+import useAuthStore from "./zustand/AuthStore";
 
 function App() {
+  const user = useAuthStore((state) => state.user);
   return (
     <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/appointments" element={<Appointments />} />
-        <Route path="/appointments/:id" element={<ViewDetails />} />
-        <Route path="/appointment/:date" element={<CreateAppointment />} />
+        <Route
+          path="/calendar"
+          element={user ? <Calendar /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/appointments"
+          element={user ? <Appointments /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/appointments/:id"
+          element={user ? <ViewDetails /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/appointment/:date"
+          element={user ? <CreateAppointment /> : <Navigate to="/" />}
+        />
         <Route path="/try-filter-camera" element={<ForTryFilter />} />
         <Route path="/reviews" element={<Reviews />} />
         {/* admin */}
-        <Route path="/admin/appointment" element={<AppointmentManagement />} />
-        <Route path="/admin/barbers" element={<BarberManagement />} />
-        <Route path="/admin/cuts" element={<CutManagement />} />
+        <Route
+          path="/admin/appointment"
+          element={user ? <AppointmentManagement /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/admin/barbers"
+          element={user ? <BarberManagement /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/admin/cuts"
+          element={user ? <CutManagement /> : <Navigate to="/" />}
+        />
       </Routes>
       <ToastContainer />
     </>

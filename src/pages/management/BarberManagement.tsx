@@ -49,6 +49,9 @@ const BarberManagement = () => {
         draggable: true,
         progress: undefined,
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.log(error);
     }
@@ -68,6 +71,9 @@ const BarberManagement = () => {
         draggable: true,
         progress: undefined,
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.log(error);
     }
@@ -108,9 +114,6 @@ const BarberManagement = () => {
           <TableHead>
             <TableRow>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                <span>ID</span>
-              </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 <span>Barber's name</span>
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -127,9 +130,6 @@ const BarberManagement = () => {
           <TableBody>
             {data?.map((item) => (
               <TableRow key={item._id}>
-                <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  {item._id}
-                </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   {item.fullname}
                 </TableCell>
@@ -200,7 +200,7 @@ const BarberManagement = () => {
           <AddBarber />
         </DialogContent>
       </Dialog>
-      <Dialog open={openUpdateBarber} onClose={toggleUpdateBarberClose} >
+      <Dialog open={openUpdateBarber} onClose={toggleUpdateBarberClose}>
         <DialogContent>
           <UpdateBarber
             toggleUpdateBarberClose={toggleUpdateBarberClose}

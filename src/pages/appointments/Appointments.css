@@ -1,0 +1,11 @@
+.Pending-appointment {
+  color: #ffbf00;
+}
+
+.Approved-appointment {
+  color: #039487;
+}
+
+.Rejected-appointment {
+  color: #ff0000;
+}

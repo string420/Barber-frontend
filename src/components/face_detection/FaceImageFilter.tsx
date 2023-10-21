@@ -8,12 +8,14 @@ import { useRef, useEffect, useState } from "react";
 import "./FaceFilter.css";
 import hair1ImagePath from "/hair1.png";
 import hair2ImagePath from "/hair2.png";
+import hair3ImagePath from "/hair3.png";
 import { AnnotatedPrediction } from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh";
 import { Coords3D } from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh/util";
 
 const hairImages: { [key: string]: string } = {
   "Hair 1": hair1ImagePath,
   "Hair 2": hair2ImagePath,
+  "Hair 3": hair3ImagePath,
 };
 
 interface Prop {
@@ -25,7 +27,12 @@ const FaceImageFilter = ({ setBase64Image }: Prop) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const captureButton = useRef<HTMLButtonElement>(null);
 
-  const [selectedHair, setSelectedHair] = useState("Hair 1");
+  const [selectedHair, setSelectedHair] = useState(() => {
+    // Use local storage to persist the selectedHair state
+    const storedSelectedHair = localStorage.getItem("selectedHair");
+    return storedSelectedHair || "Hair 1";
+  });
+
   console.log(setSelectedHair);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<AnnotatedPrediction[] | []>(
@@ -137,20 +144,14 @@ const FaceImageFilter = ({ setBase64Image }: Prop) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHair]);
 
+  const changeSelectedHair = (newHair: string) => {
+    setSelectedHair(newHair);
+    localStorage.setItem("selectedHair", newHair);
+  };
+
   return (
     <div className="face-filter">
       <div className="face-filter-container">
-        {/* <select
-          style={{ color: "white" }}
-          value={selectedHair}
-          onChange={(e) => setSelectedHair(e.target.value)}
-        >
-          {Object.keys(hairImages).map((hairOption) => (
-            <option key={hairOption} value={hairOption}>
-              {hairOption}
-            </option>
-          ))}
-        </select> */}
         {capturedImage ? (
           <></>
         ) : (
@@ -184,6 +185,7 @@ const FaceImageFilter = ({ setBase64Image }: Prop) => {
                 zIndex: 3,
               }}
             />
+
             <button
               ref={captureButton}
               onClick={captureImage}
@@ -191,6 +193,32 @@ const FaceImageFilter = ({ setBase64Image }: Prop) => {
             >
               Capture Image
             </button>
+
+            {/* <select
+              value={selectedHair}
+              style={{ position: "absolute", bottom: 0, right: 0, zIndex: 5 }}
+              onChange={(e) => setSelectedHair(e.target.value)}
+            >
+              {Object.keys(hairImages).map((hairOption) => (
+                <option key={hairOption} value={hairOption}>
+                  {hairOption}
+                </option>
+              ))}
+            </select> */}
+            <div
+              className="hair-buttons"
+              style={{ position: "absolute", bottom: 0, right: 0, zIndex: 5 }}
+            >
+              {Object.keys(hairImages).map((hairOption) => (
+                <button
+                  key={hairOption}
+                  className={selectedHair === hairOption ? "selected" : ""}
+                  onClick={() => changeSelectedHair(hairOption)}
+                >
+                  {hairOption}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

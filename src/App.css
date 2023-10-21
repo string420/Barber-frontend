@@ -10,3 +10,15 @@ body {
   overflow-x: hidden;
   background-color: rgba(0, 0, 0, 0.9);
 }
+
+.Pending {
+  background-color: #ffbf00;
+}
+
+.Approved {
+  background-color: #039487;
+}
+
+.Rejected {
+  background-color: #ff0000;
+}

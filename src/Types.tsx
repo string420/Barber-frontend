@@ -61,6 +61,7 @@ export interface AppointmentInterface {
   barberRating: number;
   base64ImageUrl: string;
   createdAt: string;
+  status: string;
 }
 
 export interface UserInterface {

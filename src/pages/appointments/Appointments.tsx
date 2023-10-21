@@ -16,11 +16,17 @@ import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import ConfirmationModal from "../../components/confirmationModal/ConfirmationModal";
+import "./Appointments.css";
+import ConfirmationModalReschedule from "../../components/confirmationModal/ConfirmationModalReschedule";
 
 const Appointments = () => {
   const user = useAuthStore((state) => state.user);
 
   const [openConfirmation, setOpenConfirmation] = useState<boolean>(false);
+
+  const [openRescheduleConfirmation, setOpenRescheduleConfirmation] =
+    useState<boolean>(false);
+
   const [paramsId, setParamsId] = useState<string>("");
 
   const { data } = useQuery<AppointmentInterface[]>({
@@ -40,6 +46,15 @@ const Appointments = () => {
     setOpenConfirmation(false);
   };
 
+  const toggleOpenRescheduleConfirmation = (id: string) => {
+    setParamsId(id);
+    setOpenRescheduleConfirmation(true);
+  };
+
+  const toggleCloseRescheduleConfirmation = () => {
+    setOpenRescheduleConfirmation(false);
+  };
+
   return (
     <div style={{ height: "calc(100vh - 100px)" }}>
       <TableContainer
@@ -53,9 +68,6 @@ const Appointments = () => {
         <Table sx={{ maxWidth: "1100px", width: "100%", height: "100%" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
-                <span>ID</span>
-              </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 <span>Email</span>
               </TableCell>
@@ -75,6 +87,9 @@ const Appointments = () => {
                 <span>Created Date</span>
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
+                <span>Status</span>
+              </TableCell>
+              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 <span>Action</span>
               </TableCell>
             </TableRow>
@@ -82,9 +97,6 @@ const Appointments = () => {
           <TableBody>
             {data?.map((item) => (
               <TableRow key={item._id}>
-                <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  {item._id}
-                </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   {item.email}
                 </TableCell>
@@ -102,6 +114,12 @@ const Appointments = () => {
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   {dayjs(item.createdAt).format("YYYY-MM-DD")}
+                </TableCell>
+                <TableCell
+                  sx={{ textAlign: "center" }}
+                  className={`${item.status}-appointment`}
+                >
+                  {item.status}
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   <div
@@ -125,6 +143,21 @@ const Appointments = () => {
                         View Details
                       </button>
                     </Link>
+
+                    <button
+                      style={{
+                        padding: "10px",
+                        backgroundColor: "green",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => toggleOpenRescheduleConfirmation(item._id)}
+                    >
+                      Reschedule
+                    </button>
+
                     <button
                       style={{
                         padding: "10px",
@@ -150,6 +183,17 @@ const Appointments = () => {
           <ConfirmationModal
             paramsId={paramsId}
             toggleCloseConfirmation={toggleCloseConfirmation}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={openRescheduleConfirmation}
+        onClose={toggleCloseRescheduleConfirmation}
+      >
+        <DialogContent>
+          <ConfirmationModalReschedule
+            paramsId={paramsId}
+            toggleCloseConfirmation={toggleCloseRescheduleConfirmation}
           />
         </DialogContent>
       </Dialog>

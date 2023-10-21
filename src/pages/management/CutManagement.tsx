@@ -78,9 +78,6 @@ const CutManagement = () => {
           <TableHead>
             <TableRow>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                <span>ID</span>
-              </TableCell>
-              <TableCell sx={{ color: "white", textAlign: "center" }}>
                 <span>Cut Style Name</span>
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -97,9 +94,6 @@ const CutManagement = () => {
           <TableBody>
             {data?.map((item) => (
               <TableRow key={item._id}>
-                <TableCell sx={{ color: "white", textAlign: "center" }}>
-                  {item._id}
-                </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   {item.cutName}
                 </TableCell>
