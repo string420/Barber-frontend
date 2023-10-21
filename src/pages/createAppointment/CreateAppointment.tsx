@@ -248,7 +248,6 @@ const CreateAppointment = () => {
             sx={{ color: "white", backgroundColor: "white" }}
             minTime={dayjs().startOf("day").add(8, "hour")}
             maxTime={dayjs().startOf("day").add(20, "hour")}
-            disablePast
             shouldDisableTime={(time) =>
               reservedTimeSlots.includes(dayjs(time).format("hh:mmA"))
             }
