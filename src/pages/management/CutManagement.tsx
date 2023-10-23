@@ -47,7 +47,7 @@ const CutManagement = () => {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_APP_BASE_URL}/api/cut/delete/${id}`
+        `${import.meta.env.VITE_APP_API_URL}/api/cut/delete/${id}`
       );
       window.location.reload();
     } catch (error) {
@@ -110,13 +110,30 @@ const CutManagement = () => {
                   }}
                 >
                   <button
-                    style={{ marginRight: "10px", cursor: "pointer" }}
+                    style={{
+                      width: "70px",
+                      height: "30px",
+                      backgroundColor: "green",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      marginRight: "10px",
+                    }}
                     onClick={() => toggleModalUpdate(item._id)}
                   >
                     Edit
                   </button>
                   <button
-                    style={{ marginRight: "10px", cursor: "pointer" }}
+                    style={{
+                      width: "70px",
+                      height: "30px",
+                      backgroundColor: "red",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                    }}
                     onClick={() => handleDelete(item._id)}
                   >
                     Delete

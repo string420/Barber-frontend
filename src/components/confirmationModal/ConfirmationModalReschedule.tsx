@@ -12,9 +12,11 @@ const ConfirmationModalReschedule = ({
   paramsId,
   toggleCloseConfirmation,
 }: Props) => {
-  const handleCancelAppointment = async () => {
-    const navigate = useNavigate();
+  console.log("reschedule params ID ito: ", paramsId);
 
+  const navigate = useNavigate();
+
+  const handleCancelAppointment = async () => {
     try {
       await axios.delete(
         `${import.meta.env.VITE_APP_API_URL}/api/appointment/delete/${paramsId}`

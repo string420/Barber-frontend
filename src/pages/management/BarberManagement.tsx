@@ -16,9 +16,23 @@ import { useState } from "react";
 import AddBarber from "../../components/management/AddBarber";
 import { toast } from "react-toastify";
 import UpdateBarber from "../../components/management/UpdateBarber";
+import DateTimeRangePicker from "@wojtekmaj/react-datetimerange-picker";
+
+type ValuePiece = Date | null;
+
+type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const BarberManagement = () => {
   const [open, setOpen] = useState<boolean>(false);
+
+  const [value, setValue] = useState<{ [key: string]: Value }>({});
+
+  const onChange = (barberId: string, newRange: Value) => {
+    setValue((prevValue) => ({
+      ...prevValue,
+      [barberId]: newRange,
+    }));
+  };
 
   const { data } = useQuery<BarberInterface[]>({
     queryKey: ["BarberManagement"],
@@ -30,31 +44,6 @@ const BarberManagement = () => {
 
   const toggleOpen = () => {
     setOpen(!open);
-  };
-
-  const onChangeHandleStatus = async (id: string, status: string) => {
-    try {
-      await axios.put(
-        `${import.meta.env.VITE_APP_API_URL}/api/barber/update/${id}`,
-        {
-          status: status,
-        }
-      );
-      toast.success(`Successfully change the status`, {
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const handleDeleteBarber = async (id: string) => {
@@ -117,7 +106,7 @@ const BarberManagement = () => {
                 <span>Barber's name</span>
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
-                <span>Status</span>
+                <span>Schedule</span>
               </TableCell>
               <TableCell sx={{ color: "white", textAlign: "center" }}>
                 <span>Created Date</span>
@@ -135,23 +124,8 @@ const BarberManagement = () => {
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   <div>
-                    <select
-                      style={{ padding: "10px", border: "1px solid #ccc" }}
-                      defaultValue={item.status}
-                      onChange={(e) =>
-                        onChangeHandleStatus(item._id, e.target.value)
-                      }
-                    >
-                      <option style={{ fontSize: "16px" }} value="available">
-                        Available
-                      </option>
-                      <option
-                        style={{ fontSize: "16px" }}
-                        value="not available"
-                      >
-                        Not available
-                      </option>
-                    </select>
+                    {dayjs(item.schedule?.[0]).format("YYYY-MM-DD HH:mm")} -{" "}
+                    {dayjs(item.schedule?.[1]).format("YYYY-MM-DD HH:mm")}
                   </div>
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>

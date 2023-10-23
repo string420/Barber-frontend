@@ -9,6 +9,7 @@ import { Transition, UserInterface } from "../../Types";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import NotificationBadge from "../NotificationBadge/NotificationBadge";
 
 const Navbar = () => {
   const user = useAuthStore((state) => state.user);
@@ -88,11 +89,11 @@ const Navbar = () => {
           <a className="navbar-links" href="/reviews">
             REVIEWS
           </a>
-          {userData?.role === "user" && (
-            <a className="navbar-links" href="/appointments">
-              APPOINTMENTS
-            </a>
-          )}
+          {/* {userData?.role === "user" && ( */}
+          <a className="navbar-links" href="/appointments">
+            APPOINTMENTS
+          </a>
+          {/* )} */}
           {userData?.role === "admin" && (
             <div className="nav-dropdown" onClick={toggleManagementDropdown}>
               <span className="nav-link">MANAGEMENT</span>
@@ -147,10 +148,12 @@ const Navbar = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  gap: "10px",
                 }}
               >
                 <Person sx={{ color: "white" }} />
                 <span style={{ color: "white", fontSize: "18px" }}>{user}</span>
+                <NotificationBadge />
               </div>
               <button className="navbar-login-btn" onClick={clearUser}>
                 LOGOUT

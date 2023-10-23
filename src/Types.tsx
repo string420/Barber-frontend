@@ -62,6 +62,8 @@ export interface AppointmentInterface {
   base64ImageUrl: string;
   createdAt: string;
   status: string;
+  userMarkAsRead: boolean;
+  userNotification: boolean;
 }
 
 export interface UserInterface {
@@ -77,6 +79,7 @@ export interface BarberInterface {
   fullname: string;
   status: string;
   createdAt: string;
+  schedule: string[];
 }
 
 export interface CutInterface {

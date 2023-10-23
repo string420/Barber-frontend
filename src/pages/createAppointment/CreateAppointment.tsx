@@ -94,9 +94,27 @@ const CreateAppointment = () => {
     fetchData();
   }, []);
 
-  const availableBarberList = barberList?.filter(
-    (item) => item.status === "available"
-  );
+  const userSelectedDate = dayjs(selectedDate); // Parse selectedDate as a dayjs object
+  const userSelectedTime = dayjs(roundedTime);
+
+  const availableBarberList = barberList.filter((barber) => {
+    const schedule = barber.schedule; // Assuming it's an array of strings
+
+    if (schedule.length === 2) {
+      const [start, end] = schedule;
+      const startDateTime = dayjs(start, "YYYY-MM-DD HH:mm");
+      const endDateTime = dayjs(end, "YYYY-MM-DD HH:mm");
+
+      return (
+        userSelectedDate.isAfter(startDateTime) &&
+        userSelectedDate.isBefore(endDateTime) &&
+        userSelectedTime.isAfter(startDateTime) &&
+        userSelectedTime.isBefore(endDateTime)
+      );
+    }
+
+    return false;
+  });
 
   const printAppointmentDetails = () => {
     const htmlContent = `
@@ -158,7 +176,7 @@ const CreateAppointment = () => {
         email: user,
         contactNumber: contactNumber,
         appointmentDate: dayjs(selectedDate).format("YYYY-MM-DD"),
-        appointmentTime: dayjs(time).format("hh:mmA"),
+        appointmentTime: dayjs(roundedTime).format("hh:mmA"),
         barberName: selectedBarber,
         cutStyle: selectedCutStyle,
         base64ImageUrl: base64Image,

@@ -27,6 +27,7 @@
     "@tensorflow/tfjs-core": "^3.6.0",
     "@types/react-html5-camera-photo": "^1.5.1",
     "@types/react-webcam": "^3.0.0",
+    "@wojtekmaj/react-datetimerange-picker": "^5.4.4",
     "axios": "^1.5.0",
     "dayjs": "^1.11.9",
     "face-api.js": "^0.22.2",

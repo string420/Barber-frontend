@@ -27,6 +27,7 @@ const AppointmentManagement = () => {
         `${import.meta.env.VITE_APP_API_URL}/api/appointment/update/${id}`,
         {
           status: status,
+          userNotification: true,
         }
       );
       toast.success(`Successfully change the status`, {

@@ -116,7 +116,7 @@ const Appointments = () => {
                   {dayjs(item.createdAt).format("YYYY-MM-DD")}
                 </TableCell>
                 <TableCell
-                  sx={{ textAlign: "center" }}
+                  sx={{ textAlign: "center", color: "white" }}
                   className={`${item.status}-appointment`}
                 >
                   {item.status}
