@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import DateTimeRangePicker from "@wojtekmaj/react-datetimerange-picker";
-import dayjs from "dayjs"; // Import dayjs for date calculations
+import dayjs from "dayjs";
 
 const AddBarber = () => {
   const [name, setName] = useState<string>("");

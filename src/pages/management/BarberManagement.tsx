@@ -16,23 +16,9 @@ import { useState } from "react";
 import AddBarber from "../../components/management/AddBarber";
 import { toast } from "react-toastify";
 import UpdateBarber from "../../components/management/UpdateBarber";
-import DateTimeRangePicker from "@wojtekmaj/react-datetimerange-picker";
-
-type ValuePiece = Date | null;
-
-type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const BarberManagement = () => {
   const [open, setOpen] = useState<boolean>(false);
-
-  const [value, setValue] = useState<{ [key: string]: Value }>({});
-
-  const onChange = (barberId: string, newRange: Value) => {
-    setValue((prevValue) => ({
-      ...prevValue,
-      [barberId]: newRange,
-    }));
-  };
 
   const { data } = useQuery<BarberInterface[]>({
     queryKey: ["BarberManagement"],
