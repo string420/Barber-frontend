@@ -1,12 +1,12 @@
 import { useState,useRef } from "react";
-import FaceImageFilter from "./FaceImageFilter";
-import { div } from "@tensorflow/tfjs-core";
+// import FaceImageFilter from "./FaceImageFilter";
+// import { div } from "@tensorflow/tfjs-core";
 
 interface Prop {
-  setBase64Image: (base64Image: string) => void;
+  // setBase64Image: (base64Image: string) => void;
 }
 
-const RenderFilter = ({ setBase64Image }: Prop) => {
+const RenderFilter = ({ }: Prop) => {
   const [showUploadButton, setShowUploadButton] = useState<boolean>(false);
   const [showTakePhotoButton, setShowTakePhotoButton] = useState<boolean>(false);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
@@ -97,7 +97,7 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
   
   const radioRef = useRef(null);
   const [responseImage, setResponseImage] = useState('');
-  const [showLoading, setShowLoading] = useState(true);
+  // const [showLoading, setShowLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
 
   const generateHaircut = async () => {
