@@ -59,7 +59,7 @@ const CreateAppointment = () => {
   const [cutStyleList, setCutStyleList] = useState<CutInterface[]>([]);
   const [selectedBarber, setSelectedBarber] = useState<string>("");
   const [selectedCutStyle, setSelectedCutStyle] = useState<string>("");
-  const [base64Image, setBase64Image] = useState<string>("");
+  // const [base64Image, setBase64Image] = useState<string>("");
   const [isOpenQRModal, setIsOpenQRModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [time, setTime] = useState<Dayjs | null>(dayjs(new Date()));
@@ -158,8 +158,6 @@ const CreateAppointment = () => {
     printWindow?.close();
   };
 
-  console.log(base64Image);
-
   const handleSubmitAppointment = async () => {
     setLoading(true);
     try {
@@ -179,7 +177,6 @@ const CreateAppointment = () => {
         appointmentTime: dayjs(roundedTime).format("hh:mmA"),
         barberName: selectedBarber,
         cutStyle: selectedCutStyle,
-        base64ImageUrl: base64Image,
         reason: reason,
         receipt: url,
       };
@@ -329,7 +326,7 @@ const CreateAppointment = () => {
           ></textarea>
         </div>
       </div>
-      <RenderFilter setBase64Image={setBase64Image} />
+      <RenderFilter />
       <button className="create-appointment-btn" onClick={toggleQRModal}>
         {loading ? "Please wait..." : "Proceed to Payment"}
       </button>
