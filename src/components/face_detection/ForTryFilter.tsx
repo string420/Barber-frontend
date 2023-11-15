@@ -1,165 +1,371 @@
-import "@tensorflow/tfjs-core";
-import "@tensorflow/tfjs-converter";
-import "@tensorflow/tfjs-backend-webgl";
-import * as faceLandmarksDetection from "@tensorflow-models/face-landmarks-detection";
-import { MediaPipeFaceMesh } from "@tensorflow-models/face-landmarks-detection/dist/types";
-import Webcam from "react-webcam";
-import { useRef, useEffect, useState } from "react";
-import "./FaceFilter.css";
-import hair1ImagePath from "/hair1.png";
-import hair2ImagePath from "/hair2.png";
-import hair3ImagePath from "/hair3.png";
-import { AnnotatedPrediction } from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh";
-import { Coords3D } from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh/util";
+import { useState, useRef } from "react";
 
-const hairImages: { [key: string]: string } = {
-  "Hair 1": hair1ImagePath,
-  "Hair 2": hair2ImagePath,
-  "Hair 3": hair3ImagePath,
-};
+const RenderFilter = () => {
+  const [showUploadButton, setShowUploadButton] = useState<boolean>(true);
+  const [showTakePhotoButton, setShowTakePhotoButton] = useState<boolean>(true);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
+  const [showRadioButtons, setShowRadioButtons] = useState<boolean>(true);
+  const [showGenerate, setShowGenerate] = useState<boolean>(false);
+  const [showReset, setShowReset] = useState<boolean>(false);
+  const [showOr, setShowOr] = useState<boolean>(true);
+  const [fileimg, setFile] = useState<File | null>(null);
 
-const ForTryFilter = () => {
-  const webcam = useRef<Webcam>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  // const handleRadioChange = (e: any) => {
+  //   if (e.target.value === "yes") {
+  //     setShowUploadButton(true);
+  //     setShowTakePhotoButton(true);
+  //     setCapturedPhoto(null);
+  //     setUploadedPhoto(null);
+  //     setShowRadioButtons(true);
+  //     setShowOr(true);
+  //   } else {
+  //     setShowUploadButton(false);
+  //     setShowTakePhotoButton(false);
+  //     setCapturedPhoto(null);
+  //     setUploadedPhoto(null);
+  //     setShowRadioButtons(false);
+  //     setShowOr(false);
+  //   }
+  // };
 
-  const [selectedHair, setSelectedHair] = useState("Hair 1");
-
-  let hairImage = new Image();
-  hairImage.src = hairImages[selectedHair];
-
-  const runFaceDetect = async () => {
-    const model = await faceLandmarksDetection.load(
-      faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
-    );
-    detect(model);
+  const handleTakePhoto = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.createElement("video");
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(stream.getVideoTracks()[0]);
+      video.srcObject = mediaStream;
+      await video.play();
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas
+        .getContext("2d")
+        ?.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const photo = canvas.toDataURL("image/png");
+      setCapturedPhoto(photo);
+      setShowTakePhotoButton(true);
+      setShowGenerate(true);
+      setShowReset(true);
+      setShowUploadButton(false);
+      setShowOr(false);
+      const blob = dataURLtoBlob(photo);
+      const file = new File([blob], "image.png", { type: "image/png" });
+      setFile(file);
+      stream.getVideoTracks()[0].stop();
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+    }
   };
 
-  const drawHair = (
-    ctx: CanvasRenderingContext2D,
-    keypoints: Coords3D,
-    hairImage: HTMLImageElement
-  ) => {
-    const foreheadPoint = keypoints[10];
-    const hairWidth = 2 * Math.abs(keypoints[120][0] - keypoints[300][0]);
-    const hairHeight = 2 * Math.abs(keypoints[15][1] - keypoints[130][1]);
-    const hairX = foreheadPoint[0] - hairWidth / 2;
-    const hairY = foreheadPoint[1] - hairHeight / 2;
+  //convert Data URL to Blob
+  function dataURLtoBlob(dataURL: string): Blob {
+    const byteString = atob(dataURL.split(",")[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: "image/png" });
+  }
 
-    ctx.drawImage(hairImage, hairX, hairY, hairWidth, hairHeight);
+  const handleUploadPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      setFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const uploadedImage = event.target?.result as string;
+        setUploadedPhoto(uploadedImage);
+        setShowTakePhotoButton(false);
+        setCapturedPhoto(null);
+        setShowGenerate(true);
+        setShowReset(true);
+        setShowOr(false);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const draw = (
-    predictions: AnnotatedPrediction[],
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-    hairImage: HTMLImageElement
-  ) => {
-    if (webcam.current && predictions.length > 0) {
-      predictions.forEach((prediction: AnnotatedPrediction) => {
-        const keypoints = prediction.scaledMesh;
-        ctx.clearRect(0, 0, width, height);
-        ctx.save();
-        ctx.beginPath();
+  const radioRef = useRef(null);
+  const [responseImage, setResponseImage] = useState("");
+  // const [showLoading, setShowLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
 
-        // Draw the video feed first
-        const videoElement = webcam.current!.video;
-        if (videoElement) {
-          ctx.drawImage(videoElement, 0, 0, width, height);
+  const generateHaircut = async () => {
+    if (radioRef.current) {
+      const radioContainer = radioRef.current as HTMLElement;
+      const selectedOption = radioContainer.querySelector(
+        "input:checked"
+      ) as HTMLInputElement;
+      if (selectedOption) {
+        const haircut = selectedOption.value.toString();
+        const image = uploadedPhoto || capturedPhoto;
+
+        if (fileimg) {
+          console.log("Haircut: ", haircut);
+          console.log("Image: ", image);
+
+          const payload = new FormData();
+          payload.append("haircut", haircut);
+          payload.append("image", fileimg);
+
+          try {
+            setProcessing(true);
+            const response = await fetch(
+              "https://flask-production-f2d6.up.railway.app/generate-haircut",
+              {
+                method: "POST",
+                body: payload,
+              }
+            );
+
+            if (response.ok) {
+              console.log("Request successful");
+              const data = await response.json();
+
+              console.log("Response Data:", data);
+              if (data.image_data) {
+                setResponseImage(data.image_data);
+                setProcessing(false);
+              } else {
+                console.error("Image generation failed:", data.error_msg);
+                setProcessing(false);
+              }
+            } else {
+              console.error("Request failed");
+              setProcessing(false);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            setProcessing(false);
+          }
+        } else {
+          console.error("No image selected.");
+          setProcessing(false);
         }
-
-        // Draw the hair filter
-        drawHair(ctx, keypoints as Coords3D, hairImage);
-
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-      });
-    }
-  };
-
-  const detect = async (model: MediaPipeFaceMesh) => {
-    if (webcam.current && canvas.current) {
-      const webcamCurrent = webcam.current as any;
-      if (webcamCurrent.video.readyState === 4) {
-        const video = webcamCurrent.video;
-        const videoWidth = webcamCurrent.video.videoWidth;
-        const videoHeight = webcamCurrent.video.videoHeight;
-        canvas.current.width = videoWidth;
-        canvas.current.height = videoHeight;
-        const newPredictions = await model.estimateFaces({
-          input: video,
-        });
-        // setPredictions(newPredictions); // Update the predictions in the state
-        const ctx = canvas.current.getContext("2d") as CanvasRenderingContext2D;
-        requestAnimationFrame(() => {
-          draw(newPredictions, ctx, videoWidth, videoHeight, hairImage);
-        });
-        detect(model);
+      } else {
+        console.error("No radio button selected.");
+        setProcessing(false);
       }
+    } else {
+      console.error("Radio container not found.");
+      setProcessing(false);
     }
   };
 
-  useEffect(() => {
-    runFaceDetect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedHair]);
+  const retryAgain = () => {
+    setResponseImage("");
+    setUploadedPhoto("");
+    setCapturedPhoto(null);
+    setShowRadioButtons(true);
+    setShowTakePhotoButton(true);
+    setShowOr(true);
+    setShowUploadButton(true);
+    setShowGenerate(false);
+    setShowReset(false);
+  };
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
-      <select
+    <div
+      style={{
+        marginTop: "30px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {/* <div className="create-appoitment-yes-no-container">
+        <span>
+          Do you want to try our virtual filter that will apply your desired
+          haircut?{" "}
+        </span>
+        <label>
+          Yes
+          <input
+            type="radio"
+            name="virtualFilter"
+            value="yes"
+            onChange={handleRadioChange}
+          />
+        </label>
+        <label>
+          No
+          <input
+            type="radio"
+            name="virtualFilter"
+            value="no"
+            onChange={handleRadioChange}
+            defaultChecked
+          />
+        </label>
+      </div> */}
+
+      <div
         style={{
-          position: "absolute",
-          bottom: 0,
-          left: "50%",
-          zIndex: 5,
-          backgroundColor: "white",
-          color: "white",
+          marginTop: "30px",
+          borderRadius: "25px",
+          border: "5px solid #1a1919",
+          padding: "10px",
         }}
-        value={selectedHair}
-        onChange={(e) => setSelectedHair(e.target.value)}
+        className="radio-buttons-container"
       >
-        {Object.keys(hairImages).map((hairOption) => (
-          <option key={hairOption} value={hairOption}>
-            {hairOption}
-          </option>
-        ))}
-      </select>
-      <div className="face-filter-container">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Webcam
-            id="canvasId"
-            audio={false}
-            ref={webcam}
+        {showRadioButtons && (
+          <div
+            style={{ marginTop: "10px" }}
+            className="radio-buttons-container"
+            ref={radioRef}
+          >
+            <label style={{ color: "white", fontSize: "20px" }}>
+              Select your Haircut:
+            </label>
+            <br></br>
+            <br></br>
+            <label>
+              <input type="radio" name="options" checked={true} value="1" />
+              <span style={{ color: "white" }}>Buzz Cut</span>
+            </label>
+            <label style={{ marginLeft: "15px" }}>
+              <input type="radio" name="options" value="2" />
+              <span style={{ color: "white" }}>Low Fade</span>
+            </label>
+            <label style={{ marginLeft: "15px" }}>
+              <input type="radio" name="options" value="3" />
+              <span style={{ color: "white" }}>Textured Fringe</span>
+            </label>
+            <label style={{ marginLeft: "15px" }}>
+              <input type="radio" name="options" value="4" />
+              <span style={{ color: "white" }}>Pompadour</span>
+            </label>
+            <label style={{ marginLeft: "15px" }}>
+              <input type="radio" name="options" value="5" />
+              <span style={{ color: "white" }}>Undercut</span>
+            </label>
+          </div>
+        )}
+        {showTakePhotoButton && (
+          <div
             style={{
-              textAlign: "center",
-              position: "absolute",
-              top: 0,
-              right: 0,
-              zIndex: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
-          <canvas
-            id="canvasId"
-            ref={canvas}
+          >
+            <button
+              className="create-appointment-btn"
+              onClick={handleTakePhoto}
+            >
+              Take a Photo
+            </button>
+          </div>
+        )}
+        {showOr && (
+          <div
             style={{
-              textAlign: "center",
-              position: "absolute",
-              top: 0,
-              right: 0,
-              zIndex: 3,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "10px",
             }}
-          />
-        </div>
+          >
+            <label htmlFor="" style={{ textAlign: "center", color: "white" }}>
+              - or -
+            </label>
+          </div>
+        )}
+        ;
+        {capturedPhoto && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <img
+              style={{ width: "400px" }}
+              src={responseImage ? responseImage : capturedPhoto}
+              alt="Captured Photo"
+            />
+          </div>
+        )}
+        {showUploadButton && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "-60px",
+            }}
+          >
+            <label
+              className="create-appointment-btn"
+              style={{ cursor: "pointer" }}
+            >
+              Upload Photo
+              <input
+                type="file"
+                style={{ display: "none" }}
+                accept="image/*"
+                onChange={handleUploadPhoto}
+              />
+            </label>
+            {uploadedPhoto && (
+              <img
+                src={responseImage ? responseImage : uploadedPhoto}
+                alt="Uploaded Photo"
+                style={{ marginTop: "10px", width: "400px" }}
+              />
+            )}
+          </div>
+        )}
+        ;
+        {showReset && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "-60px",
+            }}
+          >
+            <button className="create-appointment-btn" onClick={retryAgain}>
+              Reset Image
+            </button>
+          </div>
+        )}
+        ;
+        {showGenerate && !responseImage && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "-60px",
+            }}
+          >
+            {processing ? (
+              <button className="create-appointment-btn">Processing...</button>
+            ) : (
+              <button
+                className="create-appointment-btn"
+                onClick={generateHaircut}
+              >
+                Generate Haircut
+              </button>
+            )}
+          </div>
+        )}
+        ;
       </div>
     </div>
   );
 };
 
-export default ForTryFilter;
+export default RenderFilter;

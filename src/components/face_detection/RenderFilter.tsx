@@ -1,8 +1,10 @@
 import { useState, useRef } from "react";
-// import FaceImageFilter from "./FaceImageFilter";
-// import { div } from "@tensorflow/tfjs-core";
 
-const RenderFilter = () => {
+interface Props {
+  setBase64Image: (image: string) => void;
+}
+
+const RenderFilter = ({ setBase64Image }: Props) => {
   const [showUploadButton, setShowUploadButton] = useState<boolean>(false);
   const [showTakePhotoButton, setShowTakePhotoButton] =
     useState<boolean>(false);
@@ -132,6 +134,7 @@ const RenderFilter = () => {
               console.log("Response Data:", data);
               if (data.image_data) {
                 setResponseImage(data.image_data);
+                setBase64Image(data.image_data); // TODO: added by me
                 setProcessing(false);
               } else {
                 console.error("Image generation failed:", data.error_msg);
