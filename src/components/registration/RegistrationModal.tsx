@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { RegistrationInterface } from "../../Types";
+import "./Registration.css";
 
 const Registration = ({ toggleRegistrationModal }: any) => {
   const [registrationInfo, setRegistrationInfo] =
@@ -73,52 +74,43 @@ const Registration = ({ toggleRegistrationModal }: any) => {
   };
 
   return (
-    <div className="w-[300px] h-[390px] bg-neutral-100 flex flex-col items-center justify-center p-6 rounded-lg">
-      <h2>Registration</h2>
-      <div className="flex items-center flex-col">
+    <div className="registration">
+      <h2 className="registration-title">Registration</h2>
+      <hr className="registration-horizontal-line" />
+      <div className="registration-input-container">
         <input
-          className="w-full rounded border mb-4 p-2 border-solid border-[#ccc]"
+          className="registration-input"
           type="text"
           placeholder="Full name"
           name="fullname"
           onChange={onChangeHandler}
         />
       </div>
-      <div className="flex items-center flex-col">
+      <div className="registration-input-container">
         <input
-          className="w-full rounded border mb-4 p-2 border-solid border-[#ccc]"
+          className="registration-input"
           type="email"
           placeholder="Email"
           name="email"
           onChange={onChangeHandler}
         />
       </div>
-      <div className="flex items-center flex-col">
+      <div className="registration-input-container">
         <input
-          className="w-full rounded border mb-4 p-2 border-solid border-[#ccc]"
+          className="registration-input"
           type="password"
           placeholder="Password"
           name="password"
           onChange={onChangeHandler}
         />
       </div>
-      {error && (
-        <span
-          style={{ color: "red", paddingTop: "5px", paddingBottom: "10px" }}
-        >
-          {error}
-        </span>
-      )}
-      <div className="flex items-center gap-2.5">
-        <button
-          className="bg-[#3f51b5] text-white rounded cursor-pointer px-4 py-2 border-[none] hover:bg-[#2c387e]"
-          onClick={handleSubmit}
-        >
+      {error && <span className="error-message">{error}</span>}
+      <div className="registration-button-container">
+        <button className="registration-button" onClick={handleSubmit}>
           Register
         </button>
         <button
-          className="bg-[#3f51b5] text-white rounded cursor-pointer px-4 py-2 border-[none] hover:bg-[#2c387e]"
-          style={{ backgroundColor: "red" }}
+          className="registration-cancel-button"
           onClick={toggleRegistrationModal}
         >
           Cancel

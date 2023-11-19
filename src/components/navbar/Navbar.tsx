@@ -65,13 +65,6 @@ const Navbar = () => {
           />
         </div>
 
-        {/* <div
-          className={
-            isNavMobile
-              ? "navbar-mobile-link-container"
-              : "navbar-links-container"
-          }
-        > */}
         <div className={click ? "nav-menu active" : "nav-menu"}>
           <div className="nav-link-container">
             <a
@@ -110,7 +103,7 @@ const Navbar = () => {
 
             {userData?.role === "admin" && (
               <div className="nav-dropdown" onClick={toggleManagementDropdown}>
-                <span className="nav-link">MANAGEMENT</span>
+                <span className="navbar-links">MANAGEMENT</span>
                 {showManagementDropdown && (
                   <div
                     className="dropdown-content"

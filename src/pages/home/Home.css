@@ -6,5 +6,6 @@
 @media (max-width: 767px) {
   .home {
     overflow-x: hidden;
+    position: relative;
   }
 }

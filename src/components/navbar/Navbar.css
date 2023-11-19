@@ -73,6 +73,14 @@
   background-color: #f2f2f2;
 }
 
+.nav-menu {
+  padding-left: 50px;
+  display: flex;
+  justify-content: space-around !important;
+  align-items: center;
+  flex: 1;
+}
+
 /*  */
 
 @media (max-width: 768px) {
@@ -99,9 +107,6 @@
   display: flex;
   list-style: none;
   text-align: center;
-  margin-right: 2rem;
-
-  justify-content: space-around;
 }
 
 .nav-link-container {
@@ -115,7 +120,7 @@
   color: #f5b921;
 }
 
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 1130px) {
   .nav-menu {
     display: flex;
     align-items: center;

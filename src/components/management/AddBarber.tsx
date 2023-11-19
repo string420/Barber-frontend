@@ -30,15 +30,16 @@ const AddBarber = () => {
   return (
     <div
       style={{
-        width: "300px",
+        width: "450px",
         borderRadius: "20px",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-around",
         flexDirection: "column",
         height: "300px",
       }}
     >
+      <h2>Add Barber</h2>
       <label
         style={{ display: "flex", flexDirection: "column", width: "100%" }}
       >
