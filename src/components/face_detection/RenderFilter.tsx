@@ -209,6 +209,7 @@ const retryAgain = () => {
       <option value="3">Textured Fringe</option>
       <option value="4">Pompadour</option>
       <option value="5">Undercut</option>
+      {/* <option value="6">SlickBack</option> */}
     </select>
   </div>
 )}
