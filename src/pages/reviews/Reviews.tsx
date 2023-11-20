@@ -42,16 +42,20 @@ const Reviews = () => {
             paddingLeft: "20px",
           }}
         >
-          <h1>Barber Name: {barber._id}</h1>
-          <h1>
-            Barber Rating:{" "}
-            <Rating
-              name="simple-controlled"
-              value={barber.averageRating}
-              readOnly
-              size="large"
-            />
-          </h1>
+          {barber.averageRating !== null && (
+            <>
+              <h1>Barber Name: {barber._id}</h1>
+              <h1>
+                Barber Rating:
+                <Rating
+                  name="simple-controlled"
+                  value={barber.averageRating}
+                  readOnly
+                  size="large"
+                />
+              </h1>
+            </>
+          )}
         </div>
       ))}
     </div>
