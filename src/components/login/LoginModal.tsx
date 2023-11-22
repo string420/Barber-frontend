@@ -6,6 +6,7 @@ import useAuthStore from "../../zustand/AuthStore";
 import { LoginInterface, Transition, UserInterface } from "../../Types";
 import Registration from "../registration/RegistrationModal";
 import logo from "../../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ toggleLoginModal }: any) => {
   const setUser = useAuthStore((state) => state.setUser);
@@ -19,6 +20,10 @@ const Login = ({ toggleLoginModal }: any) => {
   const [errors, setErrors] = useState<string>("");
   const [userData, setUserData] = useState<UserInterface>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [forgotPasswordLoading, setForgotPasswordLoading] =
+    useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -67,6 +72,30 @@ const Login = ({ toggleLoginModal }: any) => {
     }
   };
 
+  const handleForgotPasswordNavigation = async () => {
+    if (credentials.email === "") {
+      alert(
+        "Please enter your email in the email input to proceed with the forgot password process."
+      );
+    } else {
+      setForgotPasswordLoading(true);
+      try {
+        await axios.post(
+          `${import.meta.env.VITE_APP_API_URL}/api/email/sentOtp`,
+          {
+            email: credentials.email,
+          }
+        );
+        setForgotPasswordLoading(false);
+        toggleLoginModal();
+        navigate(`/otp/${credentials.email}`);
+      } catch (error) {
+        console.log(error);
+        setForgotPasswordLoading(false);
+      }
+    }
+  };
+
   return (
     <div className="login">
       <img src={logo} alt="logo" className="login-logo" />
@@ -94,6 +123,11 @@ const Login = ({ toggleLoginModal }: any) => {
             <span style={{ color: "red" }}>{errors}</span>
           </div>
         )}
+        <div className="login-forgot-password">
+          <span onClick={handleForgotPasswordNavigation}>
+            {forgotPasswordLoading ? "Please wait.. " : "Forgot Password?"}
+          </span>
+        </div>
         <button className="login-btn" onClick={handleLogin}>
           {loading ? "Please wait..." : "Login"}
         </button>

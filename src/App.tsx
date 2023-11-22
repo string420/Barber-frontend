@@ -19,6 +19,7 @@ import CreateAppointment from "./pages/createAppointment/CreateAppointment";
 import ForTryFilter from "./components/face_detection/ForTryFilter";
 import Reviews from "./pages/reviews/Reviews";
 import useAuthStore from "./zustand/AuthStore";
+import OTP from "./components/otp/OTP";
 
 function App() {
   const user = useAuthStore((state) => state.user);
@@ -58,6 +59,7 @@ function App() {
           path="/admin/cuts"
           element={user ? <CutManagement /> : <Navigate to="/" />}
         />
+        <Route path="/otp/:email" element={<OTP />} />
       </Routes>
       <ToastContainer />
     </>

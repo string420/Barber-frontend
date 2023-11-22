@@ -61,3 +61,14 @@
   height: auto;
   object-fit: cover;
 }
+
+.login-forgot-password {
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+.login-forgot-password span {
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+}
