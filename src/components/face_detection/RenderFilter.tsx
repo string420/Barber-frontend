@@ -120,7 +120,7 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
           try {
             setProcessing(true);
             const response = await fetch(
-              "https://flask-production-f2d6.up.railway.app/generate-haircut",
+              "http://3.106.125.140/generate-haircut",
               {
                 method: "POST",
                 body: payload,
