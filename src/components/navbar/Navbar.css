@@ -11,7 +11,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
 }
 
 .navbar-logo {
@@ -88,12 +87,15 @@
     width: 100%;
     padding: 0px 20px;
   }
+
   .navbar-links-container {
     display: none;
   }
+
   .navbar-login-container {
     display: none;
   }
+
   .navbar-logo {
     height: 50px;
   }
@@ -171,10 +173,12 @@
     transition: all 0.5s ease;
     z-index: 1;
   }
+
   .nav-item .active {
     color: #ffdd40;
     border: none;
   }
+
   .nav-links {
     padding: 1.5rem;
     width: 100%;
