@@ -134,7 +134,7 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
           try {
             setProcessing(true);
             const response = await fetch(
-              "http://3.106.125.140/generate-haircut",
+              "https://web-production-50c7.up.railway.app/generate-haircut",
               {
                 method: "POST",
                 body: payload,
