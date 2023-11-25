@@ -62,7 +62,7 @@ const Calendar = () => {
           <img src={designLine} alt="" className="calendar-design-line" />
         </div>
 
-        <div className="fullcalendar-container">
+        <div>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
