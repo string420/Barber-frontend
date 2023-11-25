@@ -19,17 +19,31 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
     barberData?.schedule || []
   );
 
+  const [initialDateRange, setInitialDateRange] = useState<[Date, Date]>(
+    convertStringArrayToDateArray(
+      barberData?.schedule || [new Date().toString(), new Date().toString()]
+    )
+  );
+
   useEffect(() => {
     const fetch = async () => {
       const res = await axios.get(
         `${import.meta.env.VITE_APP_API_URL}/api/barber/${paramsId}`
       );
       setBarberData(res.data);
+      setSchedule(res?.data.schedule);
+
+      setInitialDateRange(
+        convertStringArrayToDateArray(
+          res.data?.schedule || [new Date().toString(), new Date().toString()]
+        )
+      );
     };
+
     fetch();
   }, [paramsId]);
 
-  console.log(barberData);
+  console.log("initial date range", initialDateRange);
 
   const handleUpdateBarber = async () => {
     const formattedSchedule: [string | null, string | null] = [
@@ -57,10 +71,7 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
     }
   };
 
-  // Function to convert string[] to [Date, Date]
-  function convertStringArrayToDateArray(
-    strings: string[]
-  ): [Date, Date] | undefined {
+  function convertStringArrayToDateArray(strings: string[]): [Date, Date] {
     if (strings && strings.length === 2) {
       const dateArray: [Date, Date] = [
         new Date(strings[0]),
@@ -68,13 +79,24 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
       ];
       return dateArray;
     }
-    return undefined;
+    return [new Date(), new Date()];
   }
 
   const maxDate =
     schedule && Array.isArray(schedule) && schedule.length === 2
       ? dayjs(schedule[0]).add(5, "day").toDate()
       : undefined;
+
+  console.log(
+    "date taena",
+    convertStringArrayToDateArray(
+      barberData?.schedule || [new Date().toString(), new Date().toString()]
+    )
+  );
+
+  useEffect(() => {
+    console.log("Component rerendered with updated data:", barberData);
+  }, [barberData]);
 
   return (
     <div
@@ -100,15 +122,17 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
           style={{ width: "98%", height: "30px", paddingLeft: "5px" }}
         />
       </label>
+
       <label
         style={{ display: "flex", flexDirection: "column", width: "100%" }}
       >
         Schedule:
         <DateTimeRangePicker
           onChange={(newRange) => setSchedule(newRange)}
-          value={convertedSchedule || [new Date(), new Date()]}
           minDate={new Date()}
           maxDate={maxDate}
+          name="schedule"
+          value={schedule}
         />
       </label>
       <button

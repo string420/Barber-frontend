@@ -7,6 +7,8 @@ const AddBarber = () => {
   const [name, setName] = useState<string>("");
   const [schedule, setSchedule] = useState<any>([null, null]);
 
+  console.log("schedule nila ", schedule);
+
   const handleAddBarber = async () => {
     try {
       const formattedSchedule: [string | null, string | null] = [

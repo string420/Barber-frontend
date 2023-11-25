@@ -1,6 +1,6 @@
 import "./CreateAppointment.css";
 import dayjs, { Dayjs } from "dayjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,6 +16,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import RenderFilter from "../../components/face_detection/RenderFilter";
 import { Dialog, DialogContent } from "@mui/material";
 import QRCode from "../../assets/qr-code.jpg";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween);
 
 const CreateAppointment = () => {
   const user = useAuthStore((state) => state.user);
@@ -59,7 +62,7 @@ const CreateAppointment = () => {
   const [cutStyleList, setCutStyleList] = useState<CutInterface[]>([]);
   const [selectedBarber, setSelectedBarber] = useState<string>("");
   const [selectedCutStyle, setSelectedCutStyle] = useState<string>("");
-  // const [base64Image, setBase64Image] = useState<string>("");
+  const [base64Image, setBase64Image] = useState<string>("");
   const [isOpenQRModal, setIsOpenQRModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [time, setTime] = useState<Dayjs | null>(dayjs(new Date()));
@@ -94,27 +97,32 @@ const CreateAppointment = () => {
     fetchData();
   }, []);
 
-  const userSelectedDate = dayjs(selectedDate); // Parse selectedDate as a dayjs object
+  const userSelectedDate = dayjs(selectedDate);
   const userSelectedTime = dayjs(roundedTime);
 
-  const availableBarberList = barberList.filter((barber) => {
-    const schedule = barber.schedule; // Assuming it's an array of strings
+  const availableBarberList = useMemo(() => {
+    return barberList.filter((barber) => {
+      const schedule = barber.schedule;
 
-    if (schedule.length === 2) {
-      const [start, end] = schedule;
-      const startDateTime = dayjs(start, "YYYY-MM-DD HH:mm");
-      const endDateTime = dayjs(end, "YYYY-MM-DD HH:mm");
+      console.log("schedule", schedule);
 
-      return (
-        userSelectedDate.isAfter(startDateTime) &&
-        userSelectedDate.isBefore(endDateTime) &&
-        userSelectedTime.isAfter(startDateTime) &&
-        userSelectedTime.isBefore(endDateTime)
-      );
-    }
+      if (schedule.length === 2) {
+        const [start, end] = schedule;
+        const startDateTime = dayjs(start, "YYYY-MM-DD HH:mm");
+        const endDateTime = dayjs(end, "YYYY-MM-DD HH:mm");
 
-    return false;
-  });
+        return (
+          userSelectedDate.isBetween(startDateTime, endDateTime, "day", "[]") &&
+          // @ts-ignore
+          userSelectedTime.isBetween(startDateTime, endDateTime, "[]") // use [] for time comparison
+        );
+      }
+
+      return false;
+    });
+  }, [barberList, userSelectedDate, userSelectedTime]);
+
+  console.log(availableBarberList);
 
   const printAppointmentDetails = () => {
     const htmlContent = `
@@ -179,6 +187,7 @@ const CreateAppointment = () => {
         cutStyle: selectedCutStyle,
         reason: reason,
         receipt: url,
+        base64ImageUrl: base64Image,
       };
 
       await axios.post(
@@ -326,7 +335,7 @@ const CreateAppointment = () => {
           ></textarea>
         </div>
       </div>
-      <RenderFilter />
+      <RenderFilter setBase64Image={setBase64Image} />
       <button className="create-appointment-btn" onClick={toggleQRModal}>
         {loading ? "Please wait..." : "Proceed to Payment"}
       </button>
