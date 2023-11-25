@@ -39,3 +39,26 @@
   font-size: 20px;
   margin: 0;
 }
+
+@media (max-width: 767px) {
+  .fc-toolbar {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .fullcalendar-container {
+    padding: 0 5px;
+    display: flex;
+    flex-direction: column !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calendar-title-container {
+    text-align: center;
+  }
+
+  .calendar-title {
+    font-size: 40px;
+  }
+}
