@@ -59,7 +59,7 @@ const CreateAppointment = () => {
   const [cutStyleList, setCutStyleList] = useState<CutInterface[]>([]);
   const [selectedBarber, setSelectedBarber] = useState<string>("");
   const [selectedCutStyle, setSelectedCutStyle] = useState<string>("");
-  // const [base64Image, setBase64Image] = useState<string>("");
+  const [base64Image, setBase64Image] = useState<string>("");
   const [isOpenQRModal, setIsOpenQRModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [time, setTime] = useState<Dayjs | null>(dayjs(new Date()));
@@ -179,6 +179,7 @@ const CreateAppointment = () => {
         cutStyle: selectedCutStyle,
         reason: reason,
         receipt: url,
+        base64ImageUrl: base64Image,
       };
 
       await axios.post(
@@ -326,7 +327,7 @@ const CreateAppointment = () => {
           ></textarea>
         </div>
       </div>
-      <RenderFilter />
+      <RenderFilter setBase64Image={setBase64Image} />
       <button className="create-appointment-btn" onClick={toggleQRModal}>
         {loading ? "Please wait..." : "Proceed to Payment"}
       </button>

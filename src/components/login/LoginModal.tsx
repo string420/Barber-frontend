@@ -42,7 +42,7 @@ const Login = ({ toggleLoginModal }: any) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
-        `${import.meta.env.VITE_APP_BASE_URL}/api/user/${credentials.email}`
+        `${import.meta.env.VITE_APP_API_URL}/api/user/${credentials.email}`
       );
       setUserData(response.data);
     };
