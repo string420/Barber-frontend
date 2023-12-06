@@ -146,6 +146,7 @@ const Appointments = () => {
 
                     <button
                       style={{
+                        height: "50px",
                         padding: "10px",
                         backgroundColor: "green",
                         color: "white",

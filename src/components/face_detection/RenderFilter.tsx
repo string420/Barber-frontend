@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { useState, useRef } from "react";
 
 interface Prop {
   setBase64Image: (image: string) => void;
@@ -12,12 +11,8 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const [showSelectBox, setShowSelectBox] = useState<boolean>(false);
-  const [showGenerate, setShowGenerate] = useState<boolean>(false);
   const [showReset, setShowReset] = useState<boolean>(false);
-  const [showOr, setShowOr] = useState<boolean>(false);
-  const [showSelectBox, setShowSelectBox] = useState<boolean>(false);
   const [showGenerate, setShowGenerate] = useState<boolean>(false);
-  const [showReset, setShowReset] = useState<boolean>(false);
   const [showOr, setShowOr] = useState<boolean>(false);
   const [fileimg, setFile] = useState<File | null>(null);
 
@@ -29,15 +24,11 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
       setUploadedPhoto(null);
       setShowSelectBox(true);
       setShowOr(true);
-      setShowSelectBox(true);
-      setShowOr(true);
     } else {
       setShowUploadButton(false);
       setShowTakePhotoButton(false);
       setCapturedPhoto(null);
       setUploadedPhoto(null);
-      setShowSelectBox(false);
-      setShowOr(false);
       setShowSelectBox(false);
       setShowOr(false);
     }
@@ -67,16 +58,11 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
       const blob = dataURLtoBlob(photo);
       const file = new File([blob], "image.png", { type: "image/png" });
       setFile(file);
-      setShowOr(false);
-      const blob = dataURLtoBlob(photo);
-      const file = new File([blob], "image.png", { type: "image/png" });
-      setFile(file);
       stream.getVideoTracks()[0].stop();
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
   };
-
 
   //convert Data URL to Blob
   function dataURLtoBlob(dataURL: string): Blob {
@@ -88,7 +74,6 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
     }
     return new Blob([ab], { type: "image/png" });
   }
-
 
   const handleUploadPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -187,7 +172,6 @@ const RenderFilter = ({ setBase64Image }: Prop) => {
     setShowGenerate(false);
     setShowReset(false);
   };
-
 
   return (
     <div

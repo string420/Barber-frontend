@@ -6,6 +6,7 @@ import axios from "axios";
 import { AppointmentInterface } from "../../Types";
 import Rating from "@mui/material/Rating";
 import { toast } from "react-toastify";
+import { Star, StarOutline } from "@mui/icons-material";
 // import Webcam from "react-webcam";
 
 // const videoConstraints = {
@@ -32,6 +33,7 @@ const ViewDetails = () => {
     useState<AppointmentInterface>();
   const [ImageFile, setImageFile] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>("");
 
   const fileTypeChecking = (e: any) => {
     var fileInput = document.getElementById("file-upload") as HTMLInputElement;
@@ -82,6 +84,7 @@ const ViewDetails = () => {
         `${import.meta.env.VITE_APP_API_URL}/api/appointment/update/${id}`,
         {
           barberRating: rating,
+          comment: comment,
         }
       );
       updateBarberRating(appointmentData?.barberName || "");
@@ -118,7 +121,6 @@ const ViewDetails = () => {
               className="base-64-image"
             />
           )}
-
           <img
             src={
               ImageFile
@@ -140,22 +142,44 @@ const ViewDetails = () => {
             />
           </label>
           {ImageFile && (
-            <label className="viewdetails-item">
-              Barber's Rating:
-              {appointmentData?.barberRating === undefined ? (
-                "loading"
-              ) : (
-                <Rating
-                  name="simple-controlled"
-                  value={rating}
-                  onChange={(event, newValue) => {
-                    console.log(event);
-                    setRating(newValue || 0);
-                  }}
-                />
-              )}
-              <button onClick={updateRating}>Submit Rating</button>
-            </label>
+            <>
+              <label className="viewdetails-item">
+                Barber's Rating:
+                {appointmentData?.barberRating === undefined ? (
+                  "loading"
+                ) : (
+                  <Rating
+                    name="simple-controlled"
+                    value={rating}
+                    size="large"
+                    icon={
+                      <Star style={{ width: "50px", height: "50px" }}></Star>
+                    }
+                    emptyIcon={
+                      <StarOutline
+                        style={{ width: "50px", height: "50px" }}
+                      ></StarOutline>
+                    }
+                    onChange={(event, newValue) => {
+                      console.log(event);
+                      setRating(newValue || 0);
+                    }}
+                  />
+                )}
+              </label>
+              <label className="viewdetails-item">
+                Comment:
+                <textarea
+                  style={{ width: "322px", padding: "10px" }}
+                  cols={10}
+                  rows={10}
+                  onChange={(e) => setComment(e.target.value)}
+                ></textarea>
+              </label>
+              <button className="submit-rating" onClick={updateRating}>
+                Submit Rating
+              </button>
+            </>
           )}
         </div>
       </div>

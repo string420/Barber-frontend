@@ -65,6 +65,13 @@ const Navbar = () => {
           />
         </div>
 
+        {/* <div
+          className={
+            isNavMobile
+              ? "navbar-mobile-link-container"
+              : "navbar-links-container"
+          }
+        > */}
         <div className={click ? "nav-menu active" : "nav-menu"}>
           <div className="nav-link-container">
             <a
@@ -103,7 +110,7 @@ const Navbar = () => {
 
             {userData?.role === "admin" && (
               <div className="nav-dropdown" onClick={toggleManagementDropdown}>
-                <span className="navbar-links">MANAGEMENT</span>
+                <span className="nav-link">MANAGEMENT</span>
                 {showManagementDropdown && (
                   <div
                     className="dropdown-content"
@@ -139,45 +146,40 @@ const Navbar = () => {
               </div>
             )}
           </div>
+        </div>
 
-          <div>
-            {user ? (
+        <div>
+          {user ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                flexDirection: "column",
+                gap: "5px",
+              }}
+              className="navbar-user-log-container"
+            >
               <div
                 style={{
                   display: "flex",
-                  alignItems: "flex-start",
-                  flexDirection: "column",
-                  gap: "5px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
                 }}
-                className="navbar-user-log-container"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                >
-                  <Person sx={{ color: "white" }} className="navbar-icon" />
-                  <span style={{ color: "white", fontSize: "18px" }}>
-                    {user}
-                  </span>
-                  <NotificationBadge />
-                </div>
-                <button className="navbar-login-btn" onClick={clearUser}>
-                  LOGOUT
-                </button>
+                <Person sx={{ color: "white" }} className="navbar-icon" />
+                <span style={{ color: "white", fontSize: "18px" }}>{user}</span>
+                <NotificationBadge />
               </div>
-            ) : (
-              <button
-                className="navbar-login-btn"
-                onClick={() => setOpen(true)}
-              >
-                LOGIN
+              <button className="navbar-login-btn" onClick={clearUser}>
+                LOGOUT
               </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button className="navbar-login-btn" onClick={() => setOpen(true)}>
+              LOGIN
+            </button>
+          )}
         </div>
 
         {/* <div className="navbar-burger-menu" onClick={toggleNavMobile}>

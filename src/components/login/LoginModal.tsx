@@ -42,7 +42,7 @@ const Login = ({ toggleLoginModal }: any) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
-        `${import.meta.env.VITE_APP_BASE_URL}/api/user/${credentials.email}`
+        `${import.meta.env.VITE_APP_API_URL}/api/user/${credentials.email}`
       );
       setUserData(response.data);
     };
@@ -95,6 +95,20 @@ const Login = ({ toggleLoginModal }: any) => {
       }
     }
   };
+
+  useEffect(() => {
+    const keyDownHandler = (event: any) => {
+      console.log("sample");
+      if (event.key === "Enter") {
+        handleLogin();
+      }
+    };
+    document.addEventListener("keydown", keyDownHandler);
+
+    return () => {
+      document.removeEventListener("keydown", keyDownHandler);
+    };
+  });
 
   return (
     <div className="login">

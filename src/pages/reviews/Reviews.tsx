@@ -1,11 +1,11 @@
 import axios from "axios";
-import { AppointmentRatingInterface } from "../../Types";
+import { AppointmentInterface, AppointmentRatingInterface } from "../../Types";
 import "./Reviews.css";
 import { useQuery } from "react-query";
 import Rating from "@mui/material/Rating";
 
 const Reviews = () => {
-  const { data } = useQuery<AppointmentRatingInterface[]>({
+  const { data: rating } = useQuery<AppointmentRatingInterface[]>({
     queryKey: ["Reviews"],
     queryFn: () =>
       axios
@@ -14,6 +14,14 @@ const Reviews = () => {
             import.meta.env.VITE_APP_API_URL
           }/api/appointment/calculate/ratings`
         )
+        .then((res) => res.data),
+  });
+
+  const { data: barberAppointmentComents } = useQuery<AppointmentInterface[]>({
+    queryKey: ["Comments"],
+    queryFn: () =>
+      axios
+        .get(`${import.meta.env.VITE_APP_API_URL}/api/appointment`)
         .then((res) => res.data),
   });
 
@@ -29,7 +37,8 @@ const Reviews = () => {
         flexDirection: "column",
       }}
     >
-      {data?.map((barber, key) => (
+      <h1>Barber overall rating</h1>
+      {rating?.map((barber, key) => (
         <div
           key={key}
           style={{
@@ -44,8 +53,8 @@ const Reviews = () => {
         >
           {barber.averageRating !== null && (
             <>
-              <h1>Barber Name: {barber._id}</h1>
-              <h1>
+              <h2>Barber Name: {barber._id}</h2>
+              <h2>
                 Barber Rating:
                 <Rating
                   name="simple-controlled"
@@ -53,9 +62,45 @@ const Reviews = () => {
                   readOnly
                   size="large"
                 />
-              </h1>
+              </h2>
             </>
           )}
+        </div>
+      ))}
+
+      <h1>Comments</h1>
+      {barberAppointmentComents?.map((item) => (
+        <div
+          key={item._id}
+          style={{
+            border: "1px solid black",
+            display: "flex",
+
+            flexDirection: "column",
+            maxWidth: "1100px",
+            width: "100%",
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              paddingLeft: "50px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: "10px",
+            }}
+          >
+            <span>Barber Name: {item.barberName}</span>
+            <Rating
+              name="simple-controlled"
+              value={item.barberRating}
+              readOnly
+              size="large"
+            />
+            <span>Comment: {item.comment}</span>
+          </div>
+          <hr style={{ width: "100%" }} />
         </div>
       ))}
     </div>

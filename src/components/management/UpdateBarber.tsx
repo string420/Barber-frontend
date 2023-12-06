@@ -1,8 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { BarberInterface } from "../../Types";
-import DateTimeRangePicker from "@wojtekmaj/react-datetimerange-picker";
-import dayjs from "dayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 interface Prop {
   paramsId: string;
@@ -13,51 +15,29 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
   console.log(paramsId);
   const [name, setName] = useState<string>("");
   const [barberData, setBarberData] = useState<BarberInterface>();
-  const [schedule, setSchedule] = useState<any>([null, null]);
-
-  const convertedSchedule = convertStringArrayToDateArray(
-    barberData?.schedule || []
-  );
-
-  const [initialDateRange, setInitialDateRange] = useState<[Date, Date]>(
-    convertStringArrayToDateArray(
-      barberData?.schedule || [new Date().toString(), new Date().toString()]
-    )
-  );
+  const [scheduleFrom, setScheduleFrom] = useState<Dayjs | null>(dayjs());
+  const [scheduleTo, setScheduleTo] = useState<Dayjs | null>(dayjs());
 
   useEffect(() => {
     const fetch = async () => {
-      const res = await axios.get(
+      const res = await axios.get<BarberInterface>(
         `${import.meta.env.VITE_APP_API_URL}/api/barber/${paramsId}`
       );
       setBarberData(res.data);
-      setSchedule(res?.data.schedule);
 
-      setInitialDateRange(
-        convertStringArrayToDateArray(
-          res.data?.schedule || [new Date().toString(), new Date().toString()]
-        )
-      );
+      setScheduleFrom(dayjs(res.data.scheduleFrom, "YYYY-MM-DD hh:mm A"));
+      setScheduleTo(dayjs(res.data.scheduleTo, "YYYY-MM-DD hh:mm A"));
     };
 
     fetch();
   }, [paramsId]);
 
-  console.log("initial date range", initialDateRange);
-
   const handleUpdateBarber = async () => {
-    const formattedSchedule: [string | null, string | null] = [
-      (schedule?.[0] as Date | null)?.toISOString() || null,
-      (schedule?.[1] as Date | null)?.toISOString() || null,
-    ];
-
     try {
       const updatedData = {
         fullname: name ? name : barberData?.fullname,
-        schedule:
-          schedule && schedule[0] && schedule[1]
-            ? formattedSchedule
-            : convertedSchedule,
+        scheduleFrom: dayjs(scheduleFrom).format("YYYY-MM-DD hh:mm A"),
+        scheduleTo: dayjs(scheduleTo).format("YYYY-MM-DD hh:mm A"),
       };
 
       await axios.put(
@@ -70,29 +50,6 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
       console.log(error);
     }
   };
-
-  function convertStringArrayToDateArray(strings: string[]): [Date, Date] {
-    if (strings && strings.length === 2) {
-      const dateArray: [Date, Date] = [
-        new Date(strings[0]),
-        new Date(strings[1]),
-      ];
-      return dateArray;
-    }
-    return [new Date(), new Date()];
-  }
-
-  const maxDate =
-    schedule && Array.isArray(schedule) && schedule.length === 2
-      ? dayjs(schedule[0]).add(5, "day").toDate()
-      : undefined;
-
-  console.log(
-    "date taena",
-    convertStringArrayToDateArray(
-      barberData?.schedule || [new Date().toString(), new Date().toString()]
-    )
-  );
 
   useEffect(() => {
     console.log("Component rerendered with updated data:", barberData);
@@ -123,18 +80,39 @@ const UpdateBarber = ({ paramsId, toggleUpdateBarberClose }: Prop) => {
         />
       </label>
 
-      <label
-        style={{ display: "flex", flexDirection: "column", width: "100%" }}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          gap: "5px",
+          marginTop: "5px",
+          marginBottom: "5px",
+        }}
       >
-        Schedule:
-        <DateTimeRangePicker
-          onChange={(newRange) => setSchedule(newRange)}
-          minDate={new Date()}
-          maxDate={maxDate}
-          name="schedule"
-          value={schedule}
-        />
-      </label>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <label
+            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+          >
+            Start of Schedule:
+            <DateTimePicker
+              value={scheduleFrom}
+              onChange={setScheduleFrom}
+              views={["year", "month", "day", "hours"]}
+            />
+          </label>
+          <label
+            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+          >
+            End of Schedule:
+            <DateTimePicker
+              value={scheduleTo}
+              onChange={setScheduleTo}
+              views={["year", "month", "day", "hours"]}
+            />
+          </label>
+        </LocalizationProvider>
+      </div>
       <button
         style={{
           width: "100%",

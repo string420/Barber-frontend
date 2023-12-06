@@ -11,12 +11,14 @@ import {
   AppointmentInterface,
   BarberInterface,
   CutInterface,
+  UserInterface,
 } from "../../Types";
 import { useLocation, useNavigate } from "react-router-dom";
 import RenderFilter from "../../components/face_detection/RenderFilter";
 import { Dialog, DialogContent } from "@mui/material";
 import QRCode from "../../assets/qr-code.jpg";
 import isBetween from "dayjs/plugin/isBetween";
+import { PatternFormat } from "react-number-format";
 
 dayjs.extend(isBetween);
 
@@ -26,10 +28,6 @@ const CreateAppointment = () => {
   const location = useLocation();
   const selectedDate = location.pathname.split("/")[2];
   const navigate = useNavigate();
-
-  // added
-
-  const [reservedTimeSlots, setReservedTimeSlots] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,11 +65,25 @@ const CreateAppointment = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [time, setTime] = useState<Dayjs | null>(dayjs(new Date()));
   const [imageFile, setImageFile] = useState<string>("");
+  const [userData, setUserData] = useState<UserInterface>();
+  const [reservedTimeSlots, setReservedTimeSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/api/user/${user}`
+      );
+      setUserData(res.data);
+    };
+    fetch();
+  }, []);
 
   const roundedTime =
     Number(time?.minute()) < 1
       ? time?.startOf("hour")
       : Number(time?.add(1, "hour").startOf("hour")) + 1;
+
+  const formattedTime = dayjs(roundedTime).format("hh:mm A");
 
   const handleCloseBtn = () => {
     setIsOpenQRModal(false);
@@ -97,32 +109,27 @@ const CreateAppointment = () => {
     fetchData();
   }, []);
 
-  const userSelectedDate = dayjs(selectedDate);
-  const userSelectedTime = dayjs(roundedTime);
+  const userSelectedDate = dayjs(
+    `${selectedDate} ${formattedTime}`,
+    "YYYY-MM-DD hh:mm A"
+  );
+
+  console.log(dayjs(userSelectedDate).format("YYYY-MM-DD hh:mm A"));
 
   const availableBarberList = useMemo(() => {
     return barberList.filter((barber) => {
-      const schedule = barber.schedule;
+      const { scheduleFrom, scheduleTo } = barber;
 
-      console.log("schedule", schedule);
+      if (scheduleFrom && scheduleTo) {
+        const startDate = dayjs(scheduleFrom, "YYYY-MM-DD hh:mm A");
+        const endDate = dayjs(scheduleTo, "YYYY-MM-DD hh:mm A");
 
-      if (schedule.length === 2) {
-        const [start, end] = schedule;
-        const startDateTime = dayjs(start, "YYYY-MM-DD HH:mm");
-        const endDateTime = dayjs(end, "YYYY-MM-DD HH:mm");
-
-        return (
-          userSelectedDate.isBetween(startDateTime, endDateTime, "day", "[]") &&
-          // @ts-ignore
-          userSelectedTime.isBetween(startDateTime, endDateTime, "[]") // use [] for time comparison
-        );
+        return userSelectedDate.isBetween(startDate, endDate, null, "[]");
       }
 
       return false;
     });
-  }, [barberList, userSelectedDate, userSelectedTime]);
-
-  console.log(availableBarberList);
+  }, [barberList, userSelectedDate]);
 
   const printAppointmentDetails = () => {
     const htmlContent = `
@@ -179,6 +186,7 @@ const CreateAppointment = () => {
       const { url } = uploadRes.data;
 
       const appointmentData = {
+        fullName: userData?.fullname,
         email: user,
         contactNumber: contactNumber,
         appointmentDate: dayjs(selectedDate).format("YYYY-MM-DD"),
@@ -310,16 +318,14 @@ const CreateAppointment = () => {
 
         <div className="calendar-container-item">
           <label>Contact Number</label>
-          <input
-            type="text"
-            maxLength={11}
-            minLength={11}
+          <PatternFormat
+            format="####-###-####"
+            mask="_"
             placeholder="Contact Number"
             className="calendar-modal-input"
-            onChange={(e) => {
-              const inputValue = e.target.value;
-              const numericValue = inputValue.replace(/\D/g, "");
-              setContactNumber(numericValue);
+            onValueChange={(values) => {
+              const { value } = values;
+              setContactNumber(value);
             }}
           />
         </div>

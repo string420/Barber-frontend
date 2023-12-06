@@ -1,8 +1,6 @@
 import "./App.css";
-import "@wojtekmaj/react-datetimerange-picker/dist/DateTimeRangePicker.css";
-import "react-calendar/dist/Calendar.css";
-import "react-clock/dist/Clock.css";
 import "react-toastify/dist/ReactToastify.css";
+import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer } from "react-toastify";
 import Navbar from "./components/navbar/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom";

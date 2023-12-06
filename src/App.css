@@ -22,3 +22,9 @@ body {
 .Rejected {
   background-color: #ff0000;
 }
+
+.datepicker {
+  height: 50px;
+  border-radius: 20px;
+  padding-left: 10px;
+}

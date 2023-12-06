@@ -110,8 +110,8 @@ const BarberManagement = () => {
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
                   <div>
-                    {dayjs(item.schedule?.[0]).format("YYYY-MM-DD HH:mm")} -{" "}
-                    {dayjs(item.schedule?.[1]).format("YYYY-MM-DD HH:mm")}
+                    {dayjs(item.scheduleFrom).format("YYYY-MM-DD hh:mm A")} -{" "}
+                    {dayjs(item.scheduleTo).format("YYYY-MM-DD hh:mm A")}
                   </div>
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>

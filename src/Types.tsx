@@ -51,6 +51,7 @@ export interface LoginInterface {
 
 export interface AppointmentInterface {
   _id: string;
+  fullName: string;
   appointmentDate: string;
   appointmentTime: string;
   barberName: string;
@@ -64,6 +65,8 @@ export interface AppointmentInterface {
   status: string;
   userMarkAsRead: boolean;
   userNotification: boolean;
+  receipt: string;
+  comment: string;
 }
 
 export interface UserInterface {
@@ -79,7 +82,8 @@ export interface BarberInterface {
   fullname: string;
   status: string;
   createdAt: string;
-  schedule: string[];
+  scheduleFrom: string;
+  scheduleTo: string;
 }
 
 export interface CutInterface {
