@@ -3,25 +3,33 @@ import { AppointmentInterface, AppointmentRatingInterface } from "../../Types";
 import "./Reviews.css";
 import { useQuery } from "react-query";
 import Rating from "@mui/material/Rating";
+import { Search } from "@mui/icons-material";
+import { useState } from "react";
 
 const Reviews = () => {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   const { data: rating } = useQuery<AppointmentRatingInterface[]>({
-    queryKey: ["Reviews"],
+    queryKey: ["Reviews", searchTerm],
     queryFn: () =>
       axios
         .get(
           `${
             import.meta.env.VITE_APP_API_URL
-          }/api/appointment/calculate/ratings`
+          }/api/appointment/calculate/ratings?searchTerm=${searchTerm}`
         )
         .then((res) => res.data),
   });
 
   const { data: barberAppointmentComents } = useQuery<AppointmentInterface[]>({
-    queryKey: ["Comments"],
+    queryKey: ["Comments", searchTerm],
     queryFn: () =>
       axios
-        .get(`${import.meta.env.VITE_APP_API_URL}/api/appointment`)
+        .get(
+          `${
+            import.meta.env.VITE_APP_API_URL
+          }/api/appointment?searchTerm=${searchTerm}`
+        )
         .then((res) => res.data),
   });
 
@@ -37,6 +45,17 @@ const Reviews = () => {
         flexDirection: "column",
       }}
     >
+      <div className="filter-container">
+        <div className="input-container">
+          <Search sx={{ color: "#ccc" }} />
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Search Barber Name"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
       <h1>Barber overall rating</h1>
       {rating?.map((barber, key) => (
         <div
@@ -67,7 +86,6 @@ const Reviews = () => {
           )}
         </div>
       ))}
-
       <h1>Comments</h1>
       {barberAppointmentComents?.map((item) => (
         <div
